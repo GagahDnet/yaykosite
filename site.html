@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELERION: Blood & Steel — Энциклопедия сборки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07050a;--bg2:#0e0b14;--bg3:#150f1e;
+  --glass:rgba(255,255,255,0.03);--glass2:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#ede0c8;--dim:#9e8a72;--muted:#4e4238;
+  --amber:#e8943a;--violet:#9d4edd;--teal:#2dd4bf;
+  --green:#22c55e;--red:#ef4444;--blue:#60a5fa;
+  --pink:#ec4899;--yellow:#eab308;--rose:#fb7185;
+  --gold:#d4af5a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--amber) var(--bg2)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--amber);border-radius:3px}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,serif;overflow-x:hidden;cursor:none;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M0 0h1v1H0zm60 0h-1v1h1zm0 60h-1v-1h1zM0 60h1v-1H0z' fill='rgba(255,255,255,0.015)'/%3E%3C/svg%3E") repeat;pointer-events:none;z-index:0}
+
+/* ── CURSOR ── */
+#cursor{position:fixed;width:14px;height:14px;border-radius:50%;background:var(--amber);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,width .2s,height .2s,background .2s;mix-blend-mode:screen;box-shadow:0 0 20px var(--amber)}
+#cursor-ring{position:fixed;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(232,148,58,.5);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .18s ease,width .3s,height .3s,border-color .3s}
+body:has(a:hover) #cursor,body:has(button:hover) #cursor,body:has(.card:hover) #cursor{width:22px;height:22px;background:var(--violet)}
+body:has(a:hover) #cursor-ring,body:has(button:hover) #cursor-ring,body:has(.card:hover) #cursor-ring{width:52px;height:52px;border-color:rgba(157,78,221,.6)}
+
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,transform .8s ease}
+#loader.gone{opacity:0;pointer-events:none;transform:scale(1.04)}
+.rune-ring{width:180px;height:180px;position:relative;margin-bottom:40px}
+.rune-ring svg{width:100%;height:100%;animation:spin 8s linear infinite}
+.rune-ring-inner{position:absolute;inset:24px;border:1px solid rgba(232,148,58,.2);border-radius:50%;animation:spin-r 5s linear infinite}
+.rune-ring-inner::after{content:'';position:absolute;inset:12px;border:1px solid rgba(157,78,221,.15);border-radius:50%;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin-r{to{transform:rotate(-360deg)}}
+.loader-title{font-family:'Cinzel Decorative',serif;font-size:2rem;letter-spacing:.3em;color:var(--amber);text-align:center;animation:pulse-text 2s ease infinite}
+.loader-sub{font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:.25em;color:var(--dim);margin-top:12px;text-transform:uppercase}
+.loader-bar{width:200px;height:2px;background:var(--border2);border-radius:2px;margin-top:32px;overflow:hidden}
+.loader-bar-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--violet));border-radius:2px;animation:load-bar 2.8s ease forwards}
+@keyframes load-bar{from{width:0}to{width:100%}}
+@keyframes pulse-text{0%,100%{opacity:.7}50%{opacity:1}}
+
+/* ── CANVAS ── */
+#particles{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(7,5,10,.92);backdrop-filter:blur(20px);border-color:var(--border2)}
+.nav-logo{font-family:'Cinzel Decorative',serif;font-size:.95rem;letter-spacing:.2em;color:var(--amber);text-decoration:none}
+.nav-links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-pill{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);background:none;border:1px solid transparent;border-radius:20px;padding:6px 14px;cursor:pointer;transition:all .25s;white-space:nowrap}
+.nav-pill:hover,.nav-pill.active{color:var(--text);border-color:var(--border2);background:var(--glass2)}
+.nav-search{display:flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--border);border-radius:24px;padding:7px 16px;min-width:200px}
+.nav-search input{background:none;border:none;outline:none;color:var(--text);font-family:'Crimson Pro',serif;font-size:.95rem;width:100%}
+.nav-search input::placeholder{color:var(--muted)}
+.search-icon{color:var(--dim);font-size:.85rem;flex-shrink:0}
+
+/* ── HERO ── */
+#hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 32px 60px}
+.hero-badge{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.2em;color:var(--violet);border:1px solid rgba(157,78,221,.3);border-radius:20px;padding:6px 18px;margin-bottom:32px;opacity:0;animation:fadein .8s .5s forwards}
+.hero-title{font-family:'Cinzel Decorative',serif;font-size:clamp(2.8rem,7vw,7rem);font-weight:900;line-height:1;letter-spacing:.04em;color:var(--text);opacity:0;animation:fadein-up .9s .7s forwards}
+.hero-title span.amber{color:var(--amber)}
+.hero-title span.violet{color:var(--violet)}
+.hero-sub{font-family:'Cinzel',serif;font-size:clamp(.9rem,2vw,1.25rem);letter-spacing:.35em;text-transform:uppercase;color:var(--dim);margin-top:20px;opacity:0;animation:fadein .8s 1s forwards}
+.hero-divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--amber),transparent);margin:36px auto;opacity:0;animation:fadein .8s 1.2s forwards}
+.hero-stats{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadein-up .8s 1.4s forwards}
+.stat{text-align:center}
+.stat-num{font-family:'Cinzel Decorative',serif;font-size:2.4rem;color:var(--amber);line-height:1}
+.stat-label{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-top:4px}
+.scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.5;animation:fadein 1s 2s forwards,bounce 2s 2.5s ease infinite}
+.scroll-hint span{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.scroll-arrow{width:20px;height:20px;border-right:1.5px solid var(--amber);border-bottom:1.5px solid var(--amber);transform:rotate(45deg)}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes fadein-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MAIN CONTENT ── */
+main{position:relative;z-index:2;max-width:1440px;margin:0 auto;padding:0 32px 80px}
+
+/* ── SECTION ── */
+.section{margin-bottom:80px}
+.section-header{display:flex;align-items:center;gap:20px;margin-bottom:36px;padding-top:24px}
+.section-icon{font-size:2.2rem;line-height:1}
+.section-info{flex:1}
+.section-title{font-family:'Cinzel',serif;font-size:1.6rem;font-weight:700;letter-spacing:.08em}
+.section-desc{font-size:.95rem;color:var(--dim);margin-top:4px}
+.section-count{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:4px 12px;flex-shrink:0}
+.section-line{height:1px;background:linear-gradient(90deg,var(--section-color,var(--amber)),transparent);margin-bottom:28px;opacity:.4}
+
+/* ── GRID ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+
+/* ── CARD ── */
+.card{background:var(--glass);border:1px solid var(--border);border-left:3px solid var(--section-color,var(--amber));border-radius:8px;padding:20px;position:relative;overflow:hidden;transition:all .28s cubic-bezier(.25,.46,.45,.94);cursor:pointer;transform-style:preserve-3d}
+.card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.04) 0%,transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover{border-color:var(--section-color,var(--amber));background:var(--glass2);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px var(--section-color,var(--amber)) inset,0 0 24px -8px var(--section-color,var(--amber))}
+.card:hover::before{opacity:1}
+.card-emoji{position:absolute;top:16px;right:16px;font-size:2rem;opacity:.15;line-height:1;transition:opacity .3s,transform .3s}
+.card:hover .card-emoji{opacity:.3;transform:scale(1.1) rotate(5deg)}
+.card-name{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;letter-spacing:.05em;color:var(--text);margin-bottom:8px;padding-right:44px;line-height:1.3}
+.card-desc{font-size:.9rem;color:var(--dim);line-height:1.55}
+.card-addons{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.addon-tag{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--section-color,var(--amber));border:1px solid currentColor;border-radius:10px;padding:2px 8px;opacity:.7;transition:opacity .2s}
+.card:hover .addon-tag{opacity:1}
+.card.hidden{display:none}
+
+/* ── KEYBINDS ── */
+#keybinds{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:48px;margin:80px 0;position:relative;overflow:hidden}
+#keybinds::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(157,78,221,.06),transparent 70%);pointer-events:none}
+.kb-header{text-align:center;margin-bottom:48px}
+.kb-title{font-family:'Cinzel Decorative',serif;font-size:1.8rem;color:var(--text);margin-bottom:8px}
+.kb-sub{color:var(--dim);font-size:.95rem}
+.kb-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+@media(max-width:900px){.kb-grid{grid-template-columns:1fr}}
+.kb-col-title{font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.kb-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);transition:background .2s;border-radius:6px;padding-left:8px;padding-right:8px}
+.kb-row:hover{background:var(--glass2)}
+.kb-row:last-child{border-bottom:none}
+.key{font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:700;background:var(--bg3);border:1px solid var(--border2);border-bottom:3px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--text);min-width:48px;text-align:center;white-space:nowrap;flex-shrink:0}
+.key.amber{border-color:var(--amber);border-bottom-color:rgba(232,148,58,.4);color:var(--amber)}
+.key.violet{border-color:var(--violet);border-bottom-color:rgba(157,78,221,.4);color:var(--violet)}
+.key.teal{border-color:var(--teal);border-bottom-color:rgba(45,212,191,.4);color:var(--teal)}
+.key.green{border-color:var(--green);border-bottom-color:rgba(34,197,94,.4);color:var(--green)}
+.kb-action{flex:1;font-size:.95rem;color:var(--text)}
+.kb-mod{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);text-align:right;flex-shrink:0}
+.kb-note{font-size:.8rem;color:var(--muted);font-style:italic;margin-top:6px}
+
+/* ── OPT HIGHLIGHT ── */
+.opt-banner{background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(45,212,191,.04));border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:24px 32px;margin-bottom:28px;display:flex;align-items:center;gap:20px}
+.opt-banner-icon{font-size:2.5rem}
+.opt-banner-text h3{font-family:'Cinzel',serif;font-size:1rem;color:var(--green);margin-bottom:4px}
+.opt-banner-text p{font-size:.9rem;color:var(--dim);line-height:1.5}
+
+/* ── MODAL ── */
+#modal-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:32px;opacity:0;pointer-events:none;transition:opacity .3s}
+#modal-overlay.open{opacity:1;pointer-events:all}
+#modal-overlay::before{content:'';position:absolute;inset:0;background:rgba(7,5,10,.85);backdrop-filter:blur(12px)}
+.modal{position:relative;background:var(--bg3);border:1px solid var(--border2);border-radius:16px;max-width:560px;width:100%;padding:40px;transform:translateY(20px) scale(.97);transition:transform .3s;max-height:80vh;overflow-y:auto}
+#modal-overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--glass);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;cursor:pointer;color:var(--dim);font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:var(--glass2);color:var(--text)}
+.modal-icon{font-size:3rem;margin-bottom:16px}
+.modal-name{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.modal-category{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:20px;opacity:.7}
+.modal-desc{font-size:1rem;color:var(--dim);line-height:1.7;margin-bottom:20px}
+.modal-addons-title{font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.modal-addons{display:flex;flex-wrap:wrap;gap:6px}
+.modal-addon{font-family:'JetBrains Mono',monospace;font-size:.72rem;border:1px solid var(--border2);border-radius:10px;padding:4px 12px;color:var(--dim)}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:2;text-align:center;padding:48px 32px;border-top:1px solid var(--border)}
+footer p{font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.footer-logo{font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:var(--amber);margin-bottom:16px}
+.footer-runes{font-size:1.4rem;letter-spacing:.5em;opacity:.2;margin-bottom:16px}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── SEARCH HIGHLIGHT ── */
+mark{background:rgba(232,148,58,.25);color:var(--amber);border-radius:2px}
+
+/* ── NO RESULTS ── */
+.no-results{grid-column:1/-1;text-align:center;padding:48px;color:var(--muted);font-family:'Cinzel',serif;letter-spacing:.1em}
+
+/* ── BACK TO TOP ── */
+#btt{position:fixed;bottom:32px;right:32px;z-index:400;width:44px;height:44px;background:var(--bg3);border:1px solid var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transform:translateY(16px);transition:all .3s;color:var(--amber);font-size:1.1rem}
+#btt.show{opacity:1;transform:none}
+#btt:hover{background:var(--glass2);box-shadow:0 0 20px rgba(232,148,58,.2)}
+
+/* ── SECTION ANCHORS ── */
+.anchor{display:block;height:80px;margin-top:-80px;visibility:hidden}
+
+@media(max-width:768px){
+  nav{padding:0 16px}.nav-links{display:none}
+  main{padding:0 16px 60px}
+  .hero-stats{gap:24px}.stat-num{font-size:1.8rem}
+  #keybinds{padding:24px 20px}
+  .card-grid{grid-template-columns:1fr}
+}
+
+/* ── WIKI PANEL ── */
+#wiki-dim{position:fixed;inset:0;z-index:1400;background:rgba(7,5,10,.5);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s}
+#wiki-dim.show{opacity:1;pointer-events:all}
+#wiki-panel{position:fixed;top:0;right:0;bottom:0;width:min(500px,92vw);z-index:1500;background:var(--bg2);border-left:1px solid var(--border2);transform:translateX(100%);transition:transform .38s cubic-bezier(.25,.46,.45,.94);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--amber) var(--bg2);display:flex;flex-direction:column}
+#wiki-panel.open{transform:translateX(0)}
+#wiki-panel::-webkit-scrollbar{width:4px}
+#wiki-panel::-webkit-scrollbar-thumb{background:var(--amber);border-radius:2px}
+.wiki-head{padding:28px 28px 20px;border-bottom:1px solid var(--border);position:relative}
+.wiki-close{position:absolute;top:16px;right:16px;background:var(--glass);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;cursor:pointer;color:var(--dim);font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.wiki-close:hover{background:var(--glass2);color:var(--text);border-color:var(--amber)}
+.wiki-emoji{font-size:3.2rem;line-height:1;margin-bottom:12px;display:block}
+.wiki-title{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:10px;padding-right:44px;line-height:1.3}
+.wiki-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.wiki-cat-badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;padding:3px 12px;border-radius:12px;border:1px solid currentColor;opacity:.85}
+.wiki-imp{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:12px}
+.wiki-imp.critical{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.wiki-imp.recommended{background:rgba(232,148,58,.1);color:var(--amber);border:1px solid rgba(232,148,58,.25)}
+.wiki-body{padding:24px 28px 40px;flex:1}
+.wiki-desc-text{font-size:.98rem;color:var(--dim);line-height:1.78;margin-bottom:28px}
+.wiki-section-label{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.wiki-tips{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.wiki-tip{display:flex;gap:12px;align-items:flex-start}
+.wiki-tip-dot{color:var(--amber);flex-shrink:0;font-size:.8rem;margin-top:3px}
+.wiki-tip-t{font-size:.92rem;color:var(--text);line-height:1.55}
+.wiki-addons-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.wiki-addon-tag{font-family:'JetBrains Mono',monospace;font-size:.65rem;border:1px solid var(--border2);border-radius:10px;padding:4px 11px;color:var(--dim);transition:all .2s;cursor:default}
+.wiki-addon-tag:hover{border-color:var(--amber);color:var(--amber)}
+
+/* ── FILTER BAR ── */
+.filter-bar{position:sticky;top:64px;z-index:200;background:rgba(7,5,10,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:10px 32px;display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+.filter-bar::-webkit-scrollbar{display:none}
+.fchip{font-family:'JetBrains Mono',monospace;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:5px 14px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.fchip:hover{color:var(--text);border-color:var(--border2)}
+.fchip.active{color:var(--bg);background:var(--amber);border-color:var(--amber)}
+.fchip.active.violet{background:var(--violet);border-color:var(--violet)}
+.fchip.active.red{background:var(--red);border-color:var(--red)}
+.fchip.active.teal{background:var(--teal);border-color:var(--teal)}
+.fchip.active.green{background:var(--green);border-color:var(--green)}
+.fchip.active.pink{background:var(--pink);border-color:var(--pink)}
+
+/* ── IMPORTANCE BADGE ON CARD ── */
+.card-imp{position:absolute;bottom:12px;right:12px;font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:8px}
+.card-imp.critical{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.card-imp.recommended{background:rgba(232,148,58,.08);color:var(--amber);border:1px solid rgba(232,148,58,.18)}
+
+/* ── MOBILE BOTTOM NAV ── */
+#mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:600;background:rgba(7,5,10,.95);backdrop-filter:blur(20px);border-top:1px solid var(--border2);padding:0 8px 8px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+#mob-nav-scroll{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding-top:8px}
+#mob-nav-scroll::-webkit-scrollbar{display:none}
+.mnav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 10px;border-radius:10px;border:none;background:none;cursor:pointer;color:var(--muted);transition:all .2s;white-space:nowrap;flex-shrink:0;min-width:52px}
+.mnav-btn:active{transform:scale(.94)}
+.mnav-btn.active{color:var(--amber);background:rgba(232,148,58,.1)}
+.mnav-btn span:first-child{font-size:1.2rem;line-height:1}
+.mnav-btn span:last-child{font-family:'JetBrains Mono',monospace;font-size:.48rem;letter-spacing:.06em;text-transform:uppercase}
+
+/* ── MOBILE SEARCH OVERLAY ── */
+#msearch-overlay{display:none;position:fixed;inset:0;z-index:800;background:var(--bg);flex-direction:column;padding:0}
+#msearch-overlay.open{display:flex}
+.ms-header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.ms-input{flex:1;background:var(--glass);border:1px solid var(--border2);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'Crimson Pro',serif;font-size:1.1rem;outline:none}
+.ms-input::placeholder{color:var(--muted)}
+.ms-close{background:none;border:none;color:var(--dim);font-size:1.3rem;cursor:pointer;padding:8px;border-radius:8px}
+.ms-results{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ms-result-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--glass);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.ms-result-item:active{background:var(--glass2);transform:scale(.98)}
+.ms-result-emoji{font-size:1.6rem;flex-shrink:0}
+.ms-result-info{flex:1;min-width:0}
+.ms-result-name{font-family:'Cinzel',serif;font-size:.95rem;font-weight:700;color:var(--text)}
+.ms-result-cat{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+.ms-result-desc{font-size:.82rem;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-empty{text-align:center;padding:48px 24px;color:var(--muted);font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:.1em}
+
+/* ── FAB SEARCH (mobile) ── */
+#fab-search{display:none;position:fixed;bottom:80px;right:20px;z-index:500;width:52px;height:52px;background:var(--amber);border-radius:50%;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(232,148,58,.4);font-size:1.3rem;color:var(--bg);transition:all .2s;align-items:center;justify-content:center}
+#fab-search:active{transform:scale(.92)}
+
+/* ── SECTION DOTS ── */
+#sdots{display:none;position:fixed;bottom:74px;left:50%;transform:translateX(-50%);gap:5px;z-index:300;padding:5px 10px;background:rgba(7,5,10,.7);border-radius:20px;backdrop-filter:blur(8px);border:1px solid var(--border)}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--muted);transition:all .3s;cursor:pointer;flex-shrink:0}
+.sdot.active{width:14px;border-radius:3px;background:var(--amber)}
+
+/* ── SWIPE INDICATOR ── */
+.swipe-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:rgba(7,5,10,.8);border:1px solid var(--amber);border-radius:12px;padding:12px 24px;font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.15em;color:var(--amber);pointer-events:none;opacity:0;transition:opacity .3s;text-transform:uppercase}
+.swipe-flash.show{opacity:1}
+
+@media(max-width:768px){
+  #mob-nav{display:block}
+  #fab-search{display:flex}
+  #sdots{display:flex}
+  .filter-bar{display:none}
+  nav{display:none}
+  main{padding:0 12px 120px}
+  #hero{padding:60px 20px 40px;min-height:70vh}
+  .hero-title{font-size:clamp(2.2rem,10vw,4rem)}
+  .card{padding:16px;min-height:auto}
+  .card-grid{grid-template-columns:1fr;gap:10px}
+  #keybinds{padding:20px 16px;margin:40px 0}
+  .kb-grid{grid-template-columns:1fr;gap:24px}
+  .section{margin-bottom:48px}
+  .section-header{margin-bottom:20px}
+  body{cursor:auto}
+  #cursor,#cursor-ring{display:none}
+  #wiki-panel{width:100%;border-left:none;border-top:1px solid var(--border2);top:auto;height:85vh;transform:translateY(100%);border-radius:20px 20px 0 0}
+  #wiki-panel.open{transform:translateY(0)}
+  .wiki-head{padding:20px 20px 16px}
+  .wiki-body{padding:16px 20px 32px}
+  #btt{bottom:88px}
+}
+</style>
+</head>
+<body>
+
+<!-- WIKI DIM + PANEL -->
+<div id="wiki-dim"></div>
+<div id="wiki-panel">
+  <div class="wiki-head">
+    <button class="wiki-close" id="wiki-close">✕</button>
+    <span class="wiki-emoji" id="wp-emoji"></span>
+    <div class="wiki-title" id="wp-title"></div>
+    <div class="wiki-badges">
+      <span class="wiki-cat-badge" id="wp-cat"></span>
+      <span class="wiki-imp" id="wp-imp" style="display:none"></span>
+    </div>
+  </div>
+  <div class="wiki-body">
+    <div class="wiki-desc-text" id="wp-desc"></div>
+    <div id="wp-tips-wrap">
+      <div class="wiki-section-label">Советы</div>
+      <ul class="wiki-tips" id="wp-tips"></ul>
+    </div>
+    <div id="wp-addons-wrap">
+      <div class="wiki-section-label">Аддоны / Зависимости</div>
+      <div class="wiki-addons-list" id="wp-addons"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="rune-ring">
+    <svg viewBox="0 0 180 180">
+      <circle cx="90" cy="90" r="80" fill="none" stroke="rgba(232,148,58,0.15)" stroke-width="1"/>
+      <circle cx="90" cy="90" r="80" fill="none" stroke="url(#rg)" stroke-width="2" stroke-dasharray="12 8" stroke-linecap="round"/>
+      <text font-size="11" fill="rgba(232,148,58,0.6)" font-family="serif">
+        <textPath href="#circ">✦ ELERION ✦ BLOOD ✦ AND ✦ STEEL ✦ v0.9.6 ✦ FABRIC ✦ 1.19.2 ✦</textPath>
+      </text>
+      <defs>
+        <path id="circ" d="M 90,10 A 80,80 0 1 1 89.99,10"/>
+        <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#e8943a"/><stop offset="50%" stop-color="#9d4edd"/><stop offset="100%" stop-color="#2dd4bf"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="rune-ring-inner"></div>
+  </div>
+  <div class="loader-title">ELERION</div>
+  <div class="loader-sub">Загрузка энциклопедии...</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- PARTICLES -->
+<canvas id="particles"></canvas>
+
+<!-- BACK TO TOP -->
+<div id="btt" title="Наверх">↑</div>
+
+<!-- NAVIGATION -->
+<nav id="nav">
+  <a class="nav-logo" href="#hero">EBS</a>
+  <div class="nav-links" id="nav-links">
+    <button class="nav-pill" data-target="opt">⚡ Оптимизация</button>
+    <button class="nav-pill" data-target="tech">⚙️ Техника</button>
+    <button class="nav-pill" data-target="magic">🔮 Магия</button>
+    <button class="nav-pill" data-target="combat">⚔️ Боёвка</button>
+    <button class="nav-pill" data-target="explore">🌍 Исследование</button>
+    <button class="nav-pill" data-target="biomes">🌲 Биомы</button>
+    <button class="nav-pill" data-target="mobs">🐉 Мобы</button>
+    <button class="nav-pill" data-target="decor">🏠 Декор</button>
+    <button class="nav-pill" data-target="food">🍖 Еда</button>
+    <button class="nav-pill" data-target="storage">📦 Хранение</button>
+    <button class="nav-pill" data-target="qol">🖥️ QoL</button>
+    <button class="nav-pill" data-target="visual">🎨 Визуал</button>
+    <button class="nav-pill" data-target="keybinds">⌨️ Бинды</button>
+  </div>
+  <div class="nav-search">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search" placeholder="Найти мод...">
+  </div>
+</nav>
+
+
+<!-- FILTER BAR -->
+<div class="filter-bar" id="filter-bar">
+  <button class="fchip active" data-filter="all">Все моды</button>
+  <button class="fchip" data-filter="critical">⚠ Критические</button>
+  <button class="fchip" data-filter="opt" data-color="green">⚡ Оптимизация</button>
+  <button class="fchip" data-filter="tech" data-color="amber">⚙ Техника</button>
+  <button class="fchip" data-filter="magic" data-color="violet">🔮 Магия</button>
+  <button class="fchip" data-filter="combat" data-color="red">⚔ Боёвка</button>
+  <button class="fchip" data-filter="explore" data-color="teal">🌍 Исследование</button>
+  <button class="fchip" data-filter="biomes" data-color="green">🌲 Биомы</button>
+  <button class="fchip" data-filter="mobs" data-color="amber">🐉 Мобы</button>
+  <button class="fchip" data-filter="decor" data-color="pink">🏠 Декор</button>
+  <button class="fchip" data-filter="food" data-color="amber">🍖 Еда</button>
+  <button class="fchip" data-filter="storage" data-color="teal">📦 Хранение</button>
+  <button class="fchip" data-filter="qol" data-color="teal">🖥 QoL</button>
+  <button class="fchip" data-filter="visual" data-color="pink">🎨 Визуал</button>
+</div>
+
+<!-- SECTION DOTS (mobile) -->
+<div id="sdots"></div>
+
+<!-- SWIPE FLASH -->
+<div class="swipe-flash" id="swipe-flash"></div>
+
+<!-- MOBILE SEARCH OVERLAY -->
+<div id="msearch-overlay">
+  <div class="ms-header">
+    <input class="ms-input" id="ms-input" type="text" placeholder="Найти мод..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="ms-close" id="ms-close">✕</button>
+  </div>
+  <div class="ms-results" id="ms-results"></div>
+</div>
+
+<!-- FAB SEARCH -->
+<button id="fab-search" title="Поиск">⌕</button>
+
+<!-- MOBILE BOTTOM NAV -->
+<div id="mob-nav">
+  <div id="mob-nav-scroll">
+    <button class="mnav-btn active" data-target="opt"><span>⚡</span><span>Оптим.</span></button>
+    <button class="mnav-btn" data-target="tech"><span>⚙️</span><span>Техника</span></button>
+    <button class="mnav-btn" data-target="magic"><span>🔮</span><span>Магия</span></button>
+    <button class="mnav-btn" data-target="combat"><span>⚔️</span><span>Боёвка</span></button>
+    <button class="mnav-btn" data-target="explore"><span>🌍</span><span>Мир</span></button>
+    <button class="mnav-btn" data-target="biomes"><span>🌲</span><span>Биомы</span></button>
+    <button class="mnav-btn" data-target="mobs"><span>🐉</span><span>Мобы</span></button>
+    <button class="mnav-btn" data-target="decor"><span>🏠</span><span>Декор</span></button>
+    <button class="mnav-btn" data-target="food"><span>🍖</span><span>Еда</span></button>
+    <button class="mnav-btn" data-target="storage"><span>📦</span><span>Склад</span></button>
+    <button class="mnav-btn" data-target="qol"><span>🖥️</span><span>QoL</span></button>
+    <button class="mnav-btn" data-target="visual"><span>🎨</span><span>Визуал</span></button>
+    <button class="mnav-btn" data-target="keybinds"><span>⌨️</span><span>Бинды</span></button>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge">Minecraft 1.19.2 · Fabric · 425 модов · v0.9.6-beta</div>
+  <h1 class="hero-title"><span class="amber">ELERION</span><br><span style="font-size:.55em;letter-spacing:.12em">BLOOD <span class="violet">&</span> STEEL</span></h1>
+  <p class="hero-sub">Энциклопедия сборки</p>
+  <div class="hero-divider"></div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">425</div><div class="stat-label">активных модов</div></div>
+    <div class="stat"><div class="stat-num">23</div><div class="stat-label">мода оптимизации</div></div>
+    <div class="stat"><div class="stat-num">87</div><div class="stat-label">фиксов конфликтов</div></div>
+    <div class="stat"><div class="stat-num">12</div><div class="stat-label">категорий</div></div>
+  </div>
+  <div class="scroll-hint">
+    <span>листай</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main id="main-content">
+
+<!-- ⚡ OPTIMIZATION -->
+<span class="anchor" id="opt"></span>
+<div class="section reveal" id="s-opt">
+  <div class="section-header">
+    <div class="section-icon">⚡</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--green)">Оптимизация</div>
+      <div class="section-desc">Моды для максимального FPS и стабильности сервера</div>
+    </div>
+    <div class="section-count">23 мода</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--green)"></div>
+  <div class="opt-banner">
+    <div class="opt-banner-icon">🚀</div>
+    <div class="opt-banner-text">
+      <h3>Критически важные моды</h3>
+      <p>Sodium + Lithium + Starlight + C2ME + FerriteCore — основной «стек оптимизации». Без них сборка теряет 40–60% производительности.</p>
+    </div>
+  </div>
+  <div class="card-grid" id="g-opt" style="--section-color:var(--green)"></div>
+</div>
+
+<!-- ⚙️ TECH -->
+<span class="anchor" id="tech"></span>
+<div class="section reveal" id="s-tech">
+  <div class="section-header">
+    <div class="section-icon">⚙️</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--amber)">Технические моды</div>
+      <div class="section-desc">Машины, энергия, автоматизация, компьютеры</div>
+    </div>
+    <div class="section-count">14 основных</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--amber)"></div>
+  <div class="card-grid" id="g-tech" style="--section-color:var(--amber)"></div>
+</div>
+
+<!-- 🔮 MAGIC -->
+<span class="anchor" id="magic"></span>
+<div class="section reveal" id="s-magic">
+  <div class="section-header">
+    <div class="section-icon">🔮</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--violet)">Магия</div>
+      <div class="section-desc">Колдовство, ритуалы, заклинания, вампиризм</div>
+    </div>
+    <div class="section-count">11 систем</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--violet)"></div>
+  <div class="card-grid" id="g-magic" style="--section-color:var(--violet)"></div>
+</div>
+
+<!-- ⚔️ COMBAT -->
+<span class="anchor" id="combat"></span>
+<div class="section reveal" id="s-combat">
+  <div class="section-header">
+    <div class="section-icon">⚔️</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--red)">Боёвка и оружие</div>
+      <div class="section-desc">Новая механика боя, сложные боссы, экзотическое оружие</div>
+    </div>
+    <div class="section-count">20 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--red)"></div>
+  <div class="card-grid" id="g-combat" style="--section-color:var(--red)"></div>
+</div>
+
+<!-- 🌍 EXPLORATION -->
+<span class="anchor" id="explore"></span>
+<div class="section reveal" id="s-explore">
+  <div class="section-header">
+    <div class="section-icon">🌍</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--teal)">Исследование и структуры</div>
+      <div class="section-desc">Данжи, деревни, квесты, руины, бонти</div>
+    </div>
+    <div class="section-count">15+ модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--teal)"></div>
+  <div class="card-grid" id="g-explore" style="--section-color:var(--teal)"></div>
+</div>
+
+<!-- 🌲 BIOMES -->
+<span class="anchor" id="biomes"></span>
+<div class="section reveal" id="s-biomes">
+  <div class="section-header">
+    <div class="section-icon">🌲</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--green)">Биомы и генерация</div>
+      <div class="section-desc">Новые измерения, биомы, рельеф, пещеры</div>
+    </div>
+    <div class="section-count">30 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--green)"></div>
+  <div class="card-grid" id="g-biomes" style="--section-color:var(--green)"></div>
+</div>
+
+<!-- 🐉 MOBS -->
+<span class="anchor" id="mobs"></span>
+<div class="section reveal" id="s-mobs">
+  <div class="section-header">
+    <div class="section-icon">🐉</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--yellow)">Мобы и существа</div>
+      <div class="section-desc">Новые животные, монстры, биомные варианты</div>
+    </div>
+    <div class="section-count">15 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--yellow)"></div>
+  <div class="card-grid" id="g-mobs" style="--section-color:var(--yellow)"></div>
+</div>
+
+<!-- 🏠 DECOR -->
+<span class="anchor" id="decor"></span>
+<div class="section reveal" id="s-decor">
+  <div class="section-header">
+    <div class="section-icon">🏠</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--pink)">Декор и строительство</div>
+      <div class="section-desc">Мебель, детали, блоки, освещение</div>
+    </div>
+    <div class="section-count">17 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--pink)"></div>
+  <div class="card-grid" id="g-decor" style="--section-color:var(--pink)"></div>
+</div>
+
+<!-- 🍖 FOOD -->
+<span class="anchor" id="food"></span>
+<div class="section reveal" id="s-food">
+  <div class="section-header">
+    <div class="section-icon">🍖</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--yellow)">Еда и фермерство</div>
+      <div class="section-desc">Кулинария, напитки, система питания</div>
+    </div>
+    <div class="section-count">5 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--yellow)"></div>
+  <div class="card-grid" id="g-food" style="--section-color:var(--yellow)"></div>
+</div>
+
+<!-- 📦 STORAGE -->
+<span class="anchor" id="storage"></span>
+<div class="section reveal" id="s-storage">
+  <div class="section-header">
+    <div class="section-icon">📦</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--blue)">Хранение</div>
+      <div class="section-desc">Хранилища, рюкзаки, МЕ-сети</div>
+    </div>
+    <div class="section-count">6 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--blue)"></div>
+  <div class="card-grid" id="g-storage" style="--section-color:var(--blue)"></div>
+</div>
+
+<!-- 🖥️ QOL -->
+<span class="anchor" id="qol"></span>
+<div class="section reveal" id="s-qol">
+  <div class="section-header">
+    <div class="section-icon">🖥️</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--teal)">QoL / Интерфейс</div>
+      <div class="section-desc">Карты, рецепты, сортировка, голосовой чат</div>
+    </div>
+    <div class="section-count">19 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--teal)"></div>
+  <div class="card-grid" id="g-qol" style="--section-color:var(--teal)"></div>
+</div>
+
+<!-- 🎨 VISUAL -->
+<span class="anchor" id="visual"></span>
+<div class="section reveal" id="s-visual">
+  <div class="section-header">
+    <div class="section-icon">🎨</div>
+    <div class="section-info">
+      <div class="section-title" style="color:var(--rose)">Визуал и анимации</div>
+      <div class="section-desc">Шейдеры, анимации, частицы, звуки</div>
+    </div>
+    <div class="section-count">26 модов</div>
+  </div>
+  <div class="section-line" style="--section-color:var(--rose)"></div>
+  <div class="card-grid" id="g-visual" style="--section-color:var(--rose)"></div>
+</div>
+
+<!-- ⌨️ KEYBINDS -->
+<span class="anchor" id="keybinds"></span>
+<div id="keybinds" class="reveal">
+  <div class="kb-header">
+    <div class="kb-title">⌨️ Бинды клавиш</div>
+    <div class="kb-sub">Настроены для максимального удобства · 87 конфликтов устранено</div>
+  </div>
+  <div class="kb-grid">
+    <div>
+      <div class="kb-col-title">Основные</div>
+      <div class="kb-row"><span class="key amber">G</span><span class="kb-action">Реактивный ранец — вкл/выкл</span><span class="kb-mod">Jetpack</span></div>
+      <div class="kb-row"><span class="key amber">H</span><span class="kb-action">Реактивный ранец — парить</span><span class="kb-mod">Jetpack</span></div>
+      <div class="kb-row"><span class="key teal">M</span><span class="kb-action">Открыть карту (полный экран)</span><span class="kb-mod">JourneyMap</span></div>
+      <div class="kb-row"><span class="key teal">U</span><span class="kb-action">Поставить метку / пинг</span><span class="kb-mod">Ping Wheel</span></div>
+      <div class="kb-row"><span class="key amber">B</span><span class="kb-action">Открыть рюкзак</span><span class="kb-mod">Traveler's Backpack</span></div>
+      <div class="kb-row"><span class="key">F4</span><span class="kb-action">Зум-приближение</span><span class="kb-mod">Zoomify</span></div>
+      <div class="kb-row"><span class="key violet">V</span><span class="kb-action">Голосовой чат (Push-to-Talk)</span><span class="kb-mod">Voice Chat</span></div>
+      <div class="kb-row"><span class="key">,</span><span class="kb-action">Выключить микрофон (мут)</span><span class="kb-mod">Voice Chat</span></div>
+      <div class="kb-row"><span class="key amber">Y</span><span class="kb-action">Тулбелт / меню инструментов</span><span class="kb-mod">Create</span></div>
+      <div class="kb-row"><span class="key">'</span><span class="kb-action">Кувырок / уклонение</span><span class="kb-mod">Combat Roll</span></div>
+      <div class="kb-col-title" style="margin-top:24px">Магия (Hexcasting)</div>
+      <div class="kb-row"><span class="key violet">N</span><span class="kb-action">Колесо иот — выбор заклинания</span><span class="kb-mod">Hexgloop</span></div>
+      <div class="kb-row"><span class="key violet">`</span><span class="kb-action">Кольцо гексов — поле рисования</span><span class="kb-mod">Hexgloop</span></div>
+      <div class="kb-row"><span class="key violet">[</span><span class="kb-action">Прокрутить заклинания ↓</span><span class="kb-mod">Hexgloop</span></div>
+      <div class="kb-row"><span class="key violet">]</span><span class="kb-action">Прокрутить заклинания ↑</span><span class="kb-mod">Hexgloop</span></div>
+      <div class="kb-row"><span class="key violet">Alt</span><span class="kb-action">Модификатор (Alt+1..5 = заклинания)</span><span class="kb-mod">Spell Engine</span></div>
+    </div>
+    <div>
+      <div class="kb-col-title">Боёвка и способности</div>
+      <div class="kb-row"><span class="key">I</span><span class="kb-action">Парировать удар</span><span class="kb-mod">Soulslike</span></div>
+      <div class="kb-row"><span class="key">K</span><span class="kb-action">Активировать способность оружия</span><span class="kb-mod">Soulslike</span></div>
+      <div class="kb-row"><span class="key">O</span><span class="kb-action">Способность расы</span><span class="kb-mod">Origins</span></div>
+      <div class="kb-row"><span class="key">U</span><span class="kb-action">Рывок вампира — был здесь ранее</span><span class="kb-mod">Haema</span></div>
+      <div class="kb-col-title" style="margin-top:24px">Ваниль (не трогать)</div>
+      <div class="kb-row"><span class="key green">WASD</span><span class="kb-action">Движение</span><span class="kb-mod">Vanilla</span></div>
+      <div class="kb-row"><span class="key green">E</span><span class="kb-action">Инвентарь</span><span class="kb-mod">Vanilla</span></div>
+      <div class="kb-row"><span class="key green">F</span><span class="kb-action">Смена руки (offhand)</span><span class="kb-mod">Vanilla</span></div>
+      <div class="kb-row"><span class="key green">Q</span><span class="kb-action">Выбросить предмет</span><span class="kb-mod">Vanilla</span></div>
+      <div class="kb-row"><span class="key green">1–9</span><span class="kb-action">Хотбар</span><span class="kb-mod">Vanilla</span></div>
+      <div class="kb-row"><span class="key green">Ctrl</span><span class="kb-action">Спринт</span><span class="kb-mod">Vanilla</span></div>
+      <div class="kb-row"><span class="key green">Shift</span><span class="kb-action">Присесть (+ сравнение экипировки)</span><span class="kb-mod">Vanilla</span></div>
+      <div class="kb-col-title" style="margin-top:24px">Заблокировано — не назначать</div>
+      <div class="kb-row"><span class="key" style="opacity:.4">C</span><span class="kb-action" style="color:var(--muted)">Зарезервировано</span><span class="kb-mod">—</span></div>
+      <div class="kb-row"><span class="key" style="opacity:.4">Z</span><span class="kb-action" style="color:var(--muted)">Зарезервировано</span><span class="kb-mod">—</span></div>
+      <div class="kb-row"><span class="key" style="opacity:.4">X</span><span class="kb-action" style="color:var(--muted)">Зарезервировано</span><span class="kb-mod">—</span></div>
+      <div class="kb-row"><span class="key" style="opacity:.4">R</span><span class="kb-action" style="color:var(--muted)">Зарезервировано</span><span class="kb-mod">—</span></div>
+      <div class="kb-note">* Ctrl+E как комбо-бинд не поддерживается в Minecraft нативно.</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">ELERION: Blood & Steel</div>
+  <div class="footer-runes">✦ ⬡ ◈ ✧ ⟡ ✦</div>
+  <p>Minecraft 1.19.2 · Fabric · v0.9.6-beta · 425 модов</p>
+</footer>
+
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+// important: 'critical' | 'recommended' | undefined
+// tips: string[]
+const DATA = {
+  opt: [
+    {name:'Sodium',emoji:'⚡',important:'critical',desc:'Полная замена ванильного рендерера блоков и чанков. Использует современные техники OpenGL. Даёт 200–400% прироста FPS на большинстве систем — самый важный мод оптимизации.',tips:['Без этого мода сборка теряет 40–60% FPS','Indium обязателен для совместимости с Iris и другими рендер-модами','Reese\'s Sodium Options добавляет расширенные настройки качества'],addons:['Indium','Reese\'s Sodium Options']},
+    {name:'Lithium',emoji:'⚙️',important:'critical',desc:'Оптимизация внутренней логики игры: алгоритмы поиска пути, обработка тиков, физика, расчёт блоков. Снижает нагрузку на CPU без изменения геймплея.',tips:['Не меняет геймплей — только скорость вычислений','Особенно заметен на серверах с большим числом мобов','Совместим со всеми другими оптимизационными модами'],addons:[]},
+    {name:'Starlight',emoji:'✨',important:'critical',desc:'Полностью переписанный движок освещения. Устраняет лаги при распространении света, ускоряет генерацию чанков и пересчёт освещения в разы.',tips:['Устраняет лаги при размещении факелов рядом','Ускоряет загрузку чанков в тёмных биомах','Поведение света идентично ванили'],addons:[]},
+    {name:'C2ME',emoji:'🔀',important:'critical',desc:'Многопоточная генерация чанков — использует все ядра процессора. Мир грузится значительно быстрее, особенно при исследовании новых территорий.',tips:['Используй /chunky до игры для предгенерации мира','Особенно заметен при высокой дальности прорисовки','Задействует все ядра CPU — важен на 6+ ядерных системах'],addons:[]},
+    {name:'FerriteCore',emoji:'💾',important:'critical',desc:'Снижает потребление оперативной памяти на 20–30% за счёт оптимизации хранения данных о состоянии блоков и NBT-тегах. Критично при 425 модах.',tips:['Экономит 1–2 ГБ RAM при 425 модах','Работает автоматически без настройки','Критичен для систем с 8 ГБ RAM'],addons:[]},
+    {name:'ModernFix',emoji:'🔧',important:'recommended',desc:'Большой пакет различных фиксов: ускорение запуска, уменьшение расхода памяти, исправление утечек, оптимизация рендеринга, ускорение загрузки ресурспаков.',tips:['Ускоряет старт игры на 10–20 секунд','Содержит 30+ отдельных фиксов в одном моде','Можно настраивать какие фиксы включены в конфиге'],addons:[]},
+    {name:'VMP',emoji:'👥',important:'recommended',desc:'Very Many Players — оптимизирует серверную часть для большого числа одновременных игроков. Снижает нагрузку от синхронизации чанков и позиций.',tips:['Важен при 5+ игроках онлайн','Снижает ping-spike при движении игроков','Серверный мод — клиентам не нужен'],addons:[]},
+    {name:'EntityCulling',emoji:'👁️',important:'recommended',desc:'Прекращает рендеринг сущностей, находящихся за непрозрачными блоками и вне поля зрения. На насыщенных мобами серверах даёт 30–60% FPS.',tips:['Особенно заметен в биомах с большим числом мобов','Не влияет на логику мобов — только рендер','30–60% прироста FPS в насыщенных областях'],addons:[]},
+    {name:'ImmediatelyFast',emoji:'🖥️',important:'recommended',desc:'Оптимизация «немедленного» рендеринга: GUI, частицы, текст, блок-энтити, шрифты. Особенно заметно при открытых интерфейсах AE2 и Create.',tips:['Сильно помогает при открытом интерфейсе AE2','Ускоряет рендер частиц и текста HUD','Заметен при большом числе активных блок-энтити'],addons:[]},
+    {name:'Dynamic FPS',emoji:'🔋',desc:'Снижает FPS до 1 кадра в секунду когда окно Minecraft не в фокусе. Экономит CPU/GPU при свёрнутой игре или при чтении чата.',tips:['Идеален для мультиплеера — можно свернуть игру','Настраивай лимит FPS в неактивном режиме','Экономит до 80% ресурсов GPU при свёрнутом окне'],addons:[]},
+    {name:'Alternate Current',emoji:'🔴',desc:'Полностью переписанная система красного камня. В 10–50x быстрее ванильной при больших схемах. Поведение 100% идентично оригиналу.',tips:['Не меняет поведение редстоуна — только скорость','В 10–50 раз быстрее при больших схемах','Незаменим на серверах с автоматизацией Create'],addons:[]},
+    {name:'Chunky',emoji:'🗺️',important:'recommended',desc:'Предгенерация чанков командой /chunky start. Запусти перед игрой — и исследование мира пройдёт без лагов и провалов FPS.',tips:['Запусти /chunky start перед игрой (радиус 3000)','Займёт 30–60 мин, но потом без лагов исследования','Можно запустить на ночь перед первым заходом'],addons:[]},
+    {name:'SmoothBoot',emoji:'🚀',desc:'Управляет потоками загрузки при старте игры для снижения времени инициализации. Особенно помогает при большом числе модов.',tips:['Снижает пиковую нагрузку CPU при запуске','Особенно заметен на слабых процессорах','Уменьшает freezeы при загрузке'],addons:[]},
+    {name:'GottaGoFast',emoji:'💨',desc:'Ускорение загрузки и перезагрузки ресурспаков за счёт параллельной обработки.',tips:['Ресурспак грузится в 2–3 раза быстрее','Особенно заметен при тяжёлых паках с HD текстурами'],addons:[]},
+    {name:'LazyDFU',emoji:'⏳',important:'recommended',desc:'Откладывает инициализацию DataFixerUpper до момента реальной необходимости. Ускоряет запуск на 10–30 секунд.',tips:['Самый лёгкий способ ускорить старт','Экономит 10–30 секунд каждого запуска','Работает из коробки без настройки'],addons:[]},
+    {name:'Mobtimizations',emoji:'🧠',desc:'Оптимизация искусственного интеллекта мобов вне зоны видимости игроков. Снижает нагрузку на сервер при большом числе существ.',tips:['Мобы за пределами видимости тикают реже','Важен при большом числе ферм мобов','Не влияет на поведение мобов рядом с игроком'],addons:[]},
+    {name:'ServerCore',emoji:'🖧',desc:'Оптимизация серверных тиков, регулировка нагрузки при пиковой активности. Добавляет инструменты мониторинга производительности.',tips:['Регулирует нагрузку при пиковой активности','Добавляет команды для мониторинга TPS','Полезен при 5+ игроках на сервере'],addons:[]},
+    {name:'BetterBiomeBlend',emoji:'🌈',desc:'Плавные переходы цветов биомов (трава, вода, листва) без просадок FPS. Улучшенный алгоритм блендинга.',tips:['Убирает резкие границы между биомами','Не влияет на производительность'],addons:[]},
+    {name:'CullLessLeaves',emoji:'🍃',desc:'Рандомное прореживание полупрозрачных листьев вдали от игрока. Сохраняет визуал при значительном сокращении числа отрисовываемых граней.',tips:['Особенно заметен в лесных биомах','Можно настроить плотность в конфиге'],addons:[]},
+    {name:'EnhancedBlockEntities',emoji:'📦',desc:'Рендеринг сундуков, печей, знаков и других блок-энтити через стандартную геометрию блоков вместо медленных Entity Renderer\'ов.',tips:['Сундуки и печи рендерятся значительно быстрее','Совместим с ресурспаками для сундуков'],addons:[]},
+    {name:'Entity Collision FPS Fix',emoji:'💥',desc:'Отключает ненужные расчёты коллизий для сущностей вне логики игрока. Значительный выигрыш при большом числе мобов.',tips:['Важен при мобовых фермах','Автоматически — конфиг не нужен'],addons:[]},
+    {name:'Farsight',emoji:'🔭',desc:'Кеширует уже загруженные чанки на клиенте при высокой дальности прорисовки. Позволяет видеть дальше без постоянной загрузки с сервера.',tips:['Позволяет видеть дальше чем renderDistance сервера','Чанки в памяти — не нужно перезагружать'],addons:[]},
+    {name:'Spark',emoji:'📊',desc:'Продвинутый профайлер производительности. Команда /spark profiler — и ты видишь что именно тормозит: мод, тик-пул или конкретная сущность.',tips:['/spark profiler — запуск профайлера','Показывает какой мод ест CPU','Незаменим при диагностике лагов'],addons:[]},
+  ],
+  tech: [
+    {name:'Create',emoji:'⚙️',important:'recommended',desc:'Модуль машин на основе вращения: шестерёнки, конвейеры, прессы, миксеры, дрели. Строй полностью механические фабрики без единого провода.',tips:['Начни с ручной дрели и пресса — они открывают прогрессию','Steam\'n\'Rails позволяет строить реальные железные дороги','Create Big Cannons — строй осадные пушки из блоков Create'],addons:['CreateAddition','Create: New Age','Create Big Cannons','Create Deco','Create Jetpack','Create: Steam\'n\'Rails','Slice and Dice','Rechiseled Create']},
+    {name:'Applied Energistics 2',emoji:'💻',important:'recommended',desc:'МЕ-сеть: храни миллиарды предметов в цифровых ячейках, автоматически крафти и сортируй через интерфейсы. Самая мощная система хранения.',tips:['Требует крафта кристаллов через энергию','Mega Cells дают ячейки огромного объёма','Интеграция с Create позволяет автоматизировать всё'],addons:['Mega Cells','FullAE2']},
+    {name:'Modern Industrialization',emoji:'🏭',important:'recommended',desc:'Полная технологическая прогрессия: добыча руд → плавка → электричество → химия → ядерная энергия. Десятки машин с глубокой взаимосвязью.',tips:['Ядерный реактор — самый мощный источник энергии в MI','Прогрессия линейная — не пропускай этапы','Интегрирован с другими тех-модами через EU/RF'],addons:[]},
+    {name:'Tech Reborn',emoji:'🔌',desc:'Альтернативная технология с генераторами, машинами переработки ресурсов и электронными компонентами. Хорошо интегрируется с другими тех-модами.',tips:['Хороший старт для технической прогрессии','Advanced Reborn добавляет эндгейм-контент','Совместим с большинством тех-модов'],addons:['Advanced Reborn','RebornCore']},
+    {name:'Powah',emoji:'⚡',desc:'Разнообразные генераторы энергии — угольные, термальные, солнечные, магматические, ядерные. Простая система хранения и передачи энергии.',tips:['Ядерный реактор Powah — простой способ получить много энергии','Термальные генераторы отлично работают у лавы','Энерговые ячейки (Energizing Rod) — старт прогрессии'],addons:[]},
+    {name:'ComputerCraft (Restitched)',emoji:'💾',desc:'Компьютеры и роботы (Turtle) программируемые на языке Lua. Полная автоматизация любых задач — фарм, сортировка, управление заводами.',tips:['Turtle-роботы могут добывать шахты автоматически','Peripheralium добавляет датчики, GPS и многое другое','CC:VS Bridge — управляй кораблями Valkyrien Skies с кода'],addons:['Peripheralium','Peripheral Works','CC:VS Bridge']},
+    {name:'Botania',emoji:'🌸',desc:'Магическая техника на основе маны из цветов. Маусхолд, спарки, руничная мастерская. Уникальная философия: никаких интерфейсов — только механика.',tips:['Никакого HUD и инвентаря — только физическая механика','Маусхолд — аналог инвентаря, но в физическом мире','Связка с Create даёт бесконечную ману'],addons:['KubeJS Botania']},
+    {name:'KubeJS',emoji:'📝',important:'critical',desc:'Полная кастомизация игры на JavaScript: рецепты, события, лут, квесты. Всё нестандартное в сборке — через KubeJS.',tips:['Это движок кастомного контента сборки — не удалять','Все модифицированные рецепты работают через него','LootJS управляет дропом из сундуков и мобов'],addons:['KubeJS Create','KubeJS Additions','Rhino','PonderJS','LootJS']},
+    {name:'Alchemistry',emoji:'⚗️',desc:'Химия: разложение материалов на элементы, синтез новых веществ. Реальная таблица Менделеева как основа механики.',tips:['Химические элементы — реальная таблица Менделеева','Позволяет синтезировать редкие материалы','Хорошо дополняет Modern Industrialization'],addons:['ChemLib']},
+    {name:'Deep Mob Learning',emoji:'🧬',desc:'Обучение моделей мобов для получения их дропа без гринда. Масштабируй фарм — от простых зомби до боссов.',tips:['Хорошая альтернатива гринду для получения ресурсов','Начни с простых мобов, потом переходи к боссам','Модели улучшаются с каждым использованием'],addons:[]},
+    {name:'Advanced Genetics',emoji:'🧪',desc:'Встраивай способности мобов в себя: скорость крипера, прочность голема, полёт летучей мыши. Генетическая модификация персонажа.',tips:['Полёт летучей мыши — один из лучших ранних эффектов','Совмещай несколько генов для OP-персонажа','Некоторые гены требуют сложных компонентов'],addons:[]},
+    {name:'Wired Redstone',emoji:'🔴',desc:'Провода для передачи сигнала красного камня на большие расстояния без задержки. Упрощает сложные схемы.',tips:['Передаёт сигнал через стены без повторителей','Идеален для управления Create-механизмами издалека'],addons:[]},
+    {name:'Chunk Loaders',emoji:'📌',important:'recommended',desc:'Чанклоадеры для постоянной загрузки территорий. Незаменимы для ферм и автоматизации когда игрок офлайн.',tips:['Без них фермы перестают работать когда ты уходишь','Не злоупотребляй — каждый лоадер нагружает сервер','Размести у каждой крупной автоматической фермы'],addons:[]},
+  ],
+  magic: [
+    {name:'Hexcasting',emoji:'🔮',important:'recommended',desc:'Магия рисованием паттернов на сетке. Никакого мана-бара — только логика и цепочки заклинаний. Тьюринг-полный магический язык программирования.',tips:['Учи паттерны в книге гримуара пошагово','Hexgloop добавляет удобное колесо заклинаний (N)','Можно написать программу на магии — это буквально ЯП'],addons:['Hexal','Hexgloop','Hexlink','Hex Shield','Oneironaut']},
+    {name:'Bewitchment',emoji:'🕯️',desc:'Классическое колдовство: зелья, ритуалы, знакомые-питомцы, шабаши, проклятия. Ночная магия с акцентом на атмосферу и фольклор.',tips:['Ритуалы требуют конкретных ингредиентов и времени суток','Знакомые-питомцы дают постоянные бонусы','Некоторые эффекты работают только ночью'],addons:['Besmirchment','BewitchmentPlus']},
+    {name:'Spectrum',emoji:'🌈',desc:'Уникальная прогрессия через цвета и спектральные кристаллы. Нет стандартных крафтов — только особые механики каждого цвета спектра.',tips:['Открывай цвета по порядку — каждый разблокирует новое','Spectrum Jetpacks — один из лучших вариантов полёта','Не спеши — исследуй каждый цвет'],addons:['Spectrum Jetpacks']},
+    {name:'Wizards',emoji:'🧙',important:'recommended',desc:'Школы боевой магии: огонь, лёд, молния, некромантия, тьма. Заклинания кастуются в реальном времени с анимациями и эффектами.',tips:['SpellBlade позволяет зачаровывать оружие заклинаниями','Spell Power прокачивается с каждым использованием','Выбери одну школу для специализации'],addons:['Spell Engine','Spell Power','SpellBlade Next']},
+    {name:'Haema',emoji:'🩸',important:'recommended',desc:'Вампиризм: пей кровь врагов для силы, обретай способности (рывок, туман, ночное зрение), но бойся солнца и чеснока. Полноценная тёмная прогрессия.',tips:['Дневной свет наносит урон — носи броню или держись в тени','Рывок вампира — один из лучших инструментов мобильности','Кровь разных мобов даёт разные способности'],addons:[]},
+    {name:'Rootsclassic',emoji:'🌿',desc:'Травяная магия: ритуалы из природных материалов, зелья из растений, призыв существ. Экологичная и атмосферная система.',tips:['Все ингредиенты берутся из природы — никаких руд','Хорошо сочетается с Bewitchment','Ритуалы работают в любое время'],addons:[]},
+    {name:'Runes',emoji:'ᚱ',desc:'Руны-зачарования, выбиваемые на специальных блоках. Постоянные магические эффекты в области.',tips:['Руны работают как постоянный AoE-эффект','Используй для защиты базы или шахты'],addons:[]},
+    {name:'Spirit',emoji:'👻',desc:'Захват душ мобов в сосуды-кристаллы. Используй их для крафта, ритуалов и создания магических предметов.',tips:['Души нужны для крафта высокоуровневых магических предметов','Разные мобы дают разные типы душ'],addons:[]},
+    {name:'Miskatonic Mysteries',emoji:'🦑',desc:'Лавкрафтовская магия: запретные знания, безумие, тентакли. Мрачная и опасная система для любителей Лавкрафта.',tips:['Высокая цена знания — безумие реально опасно','Тёмная тематика: только для отважных','Редкие предметы — высокая награда'],addons:[]},
+    {name:'Fallen Wizards',emoji:'💀',desc:'Маги-враги в открытом мире — опасные противники с заклинаниями и уникальным лутом.',tips:['Опаснее обычных мобов — готовь зелья','Дроп содержит редкие магические компоненты'],addons:[]},
+    {name:'More Wizards',emoji:'🪄',desc:'Дополнительные типы магов-мобов с разными школами и способностями.',tips:['Каждый тип мага имеет иммунитет к своей школе','Изучай их паттерны атак'],addons:[]},
+  ],
+  combat: [
+    {name:'Better Combat',emoji:'⚔️',important:'recommended',desc:'Новые анимации атак, комбо-удары, учёт длины оружия, двойное оружие. Полная переработка ощущений от ближнего боя.',tips:['Комбо работает — не стой на месте во время боя','Двуручное оружие даёт AoE-урон по площади','Длина оружия учитывается: копьё бьёт дальше меча'],addons:[]},
+    {name:'Combat Roll',emoji:'🤸',important:'recommended',desc:'Кувырок с кулдауном для уклонения от атак. Привязан на апостроф (\'), работает с разными видами движений.',tips:['Кувырок с кулдауном — используй только в нужный момент','В сочетании с Soulslike Weaponry это полноценный Souls-геймплей','Лёгкая броня сокращает кулдаун кувырка'],addons:[]},
+    {name:'Soulslike Weaponry',emoji:'🗡️',important:'recommended',desc:'Оружие в стиле Dark Souls: фростфайр-мечи, копья душ, магические клинки. Парирование (I), способности (K), проджектайлы.',tips:['Magitek Mechs — экзоскелеты с огромным уроном','Парирование (I) — тайминг важен, но награда велика','Способность оружия (K) часто сильнее обычной атаки'],addons:['Magitek Mechs']},
+    {name:'Minecraft Doom',emoji:'💥',important:'recommended',desc:'Оружие, враги и предметы из DOOM — дробовики, плазменные пушки, BFG, импы и бароны ада. Для настоящего кровавого экшена.',tips:['BFG — самое разрушительное оружие в сборке','Дробовик эффективен в ближнем бою','Импы и бароны ада — опасные враги, будь осторожен'],addons:[]},
+    {name:'Brutal Bosses',emoji:'👹',desc:'Кастомные боссы с уникальными паттернами атак, фазами боя и специальным лутом. Несравнимо сложнее ванильных боссов.',tips:['Готовь полный комплект зелий перед каждым боссом','Боссы имеют фазы — меняй тактику в середине боя','Лут уникален и не получить другим путём'],addons:[]},
+    {name:'Eldritch Mobs',emoji:'🌀',desc:'Рандомные элитные мобы с особыми способностями: регенерация, скорость, яд, взрыв, молния. Каждый встреченный моб может быть элитным.',tips:['Элитные мобы помечены особым свечением','Каждый элитный моб имеет рандомный набор способностей','Урон и здоровье выше обычных — не атакуй без подготовки'],addons:[]},
+    {name:'Mutant Monsters',emoji:'💪',desc:'Мутировавшие версии ванильных мобов: зомби-великан, взрывной скелет, огромный крипер. Значительно сильнее оригиналов.',tips:['Мутантный крипер взрывается несколько раз — беги дальше','Мутантный зомби поднимает других зомби','Лут от мутантов уникален'],addons:[]},
+    {name:'MobCaptains',emoji:'🎖️',desc:'Капитаны-лидеры мобов с усиленными статами, особыми способностями и командой последователей.',tips:['Убей капитана — его команда теряет бонусы','Капитаны имеют уникальный лут','Легко узнать по особой частице над головой'],addons:[]},
+    {name:'Majrusz\'s Difficulty',emoji:'📈',desc:'Масштабируемая сложность: мобы усиливаются со временем и прогрессом игрока. Ранняя игра остаётся доступной, поздняя — по-настоящему опасной.',tips:['Мобы становятся сильнее по мере твоего прогресса','Majrusz Accessories — кольца и амулеты дают боевые бонусы','Уникальные зачарования открывают новые механики'],addons:['Majrusz\'s Enchantments','Majrusz\'s Accessories']},
+    {name:'Artifacts',emoji:'💍',desc:'Уникальные артефакты-предметы с нестандартными эффектами: сапоги-прыжки, перчатки-скорость, флейта гоблинов.',tips:['Ищи в данжах и сундуках — не крафтятся','Некоторые артефакты полностью меняют стиль игры','Флейта гоблинов призывает гоблинов-союзников'],addons:[]},
+    {name:'Warrior Rage',emoji:'😡',desc:'Rage-механика: убивай врагов для накопления ярости и усиления урона. Чем агрессивнее стиль — тем мощнее персонаж.',tips:['Ярость накапливается только в бою','Не стой — двигайся и атакуй постоянно','В сочетании с Better Combat — очень сильная синергия'],addons:[]},
+    {name:'Grapple Mod',emoji:'🪝',desc:'Крюк-кошка для быстрого перемещения и тактического боя. Цепляйся за стены, подтягивай врагов.',tips:['Можно подтягивать врагов к себе или себя к ним','Отличный инструмент паркура и вертикального боя','Скорость перемещения выше чем у элитр'],addons:[]},
+    {name:'Defensive Measures',emoji:'🛡️',desc:'Оборонительные постройки: турели, ловушки, шипы. Защищай базу от рейдов мобов.',tips:['Турели атакуют любых враждебных мобов автоматически','Идеально для защиты базы в мультиплеере','Питание нужно — подключи к Create или Powah'],addons:[]},
+    {name:'HWG (Heavy Weapons)',emoji:'🔫',desc:'Тяжёлое ручное вооружение: пушки, ракетомёты, тяжёлые щиты. Медленные, но разрушительные.',tips:['Ракеты наносят огромный урон по площади','Медленная скорострельность — выбирай момент','Отлично против боссов и групп мобов'],addons:[]},
+    {name:'SimpleAnimatedGuns',emoji:'🔫',desc:'Огнестрельное оружие с анимацией перезарядки, прицеливания и отдачи. Реалистичная механика стрельбы.',tips:['Каждое оружие требует боеприпасы','Прицеливание ПКМ улучшает точность','Перезарядка — реальное время, не мгновенная'],addons:[]},
+    {name:'MC Halo',emoji:'🪖',desc:'Оружие из вселенной Halo: пистолеты, штурмовые винтовки, гранаты, энергетические мечи.',tips:['Энергетический меч — мощное оружие ближнего боя','Гранаты эффективны против групп врагов','Плазменный пистолет — высокая скорострельность'],addons:[]},
+    {name:'Arachnids',emoji:'🕷️',desc:'Механические пауки-оружия и паукообразные враги с уникальными атаками.',tips:['Пауки-враги опаснее ванильных','Оружие-паук — нестандартное но эффективное'],addons:[]},
+    {name:'Clean Cut',emoji:'✂️',desc:'Один удар проходит сквозь нескольких мобов стоящих в ряд. Делает копья и алебарды ситуативно мощнее.',tips:['Выстраивай мобов в линию — один удар = несколько хитов','Особенно полезно с длинным оружием из Better Combat'],addons:[]},
+  ],
+  explore: [
+    {name:'YUNG\'s Better Series',emoji:'🗺️',important:'recommended',desc:'Полная переработка всех ванильных структур: данжи, шахты, пирамиды, монументы, крепости, мосты, храмы. Каждая — уникальная, с паззлами и лутом.',tips:['Каждая структура уникальна — нет двух одинаковых','Данжи имеют ловушки — не спеши','Мосты, крепости Незера — всё стало интереснее'],addons:['Better Dungeons','Better Mineshafts','Better Desert Temples','Better Ocean Monuments','Better Bridges','Better Nether Fortresses','Better Jungle Temples','Better End Island','Better Witch Huts']},
+    {name:'Towns and Towers',emoji:'🏰',desc:'Деревни и сторожевые башни с уникальным дизайном под каждый биом. Архитектура в стиле биома — снежные, джунглевые, пустынные.',addons:[]},
+    {name:'Dungeons and Taverns',emoji:'🍺',desc:'Таверны, постоялые дворы и небольшие данжи как точки интереса в открытом мире. Отличный лут и атмосферные постройки.',addons:[]},
+    {name:'Repurposed Structures',emoji:'♻️',desc:'Варианты всех ванильных структур под каждый биом — крепости в пустыне, шахты в Незере, деревни в грибных биомах.',addons:[]},
+    {name:'Structory',emoji:'🏛️',desc:'Новые структуры: алтари, руины, склепы, брошенные базы. Разбросаны по всему миру с уникальным лутом.',addons:['Structory Towers']},
+    {name:'Philip\'s Ruins',emoji:'🪨',desc:'Живописные руины с лутом в разных стилях — античные, средневековые, заброшенные деревенские. Украшают пейзаж.',addons:[]},
+    {name:'Explorify',emoji:'🔍',desc:'Небольшие точки интереса: заброшенные лагеря, обломки кораблей, упавшие деревья с кладами. Стимулирует исследование.',addons:[]},
+    {name:'Underground Bunkers',emoji:'🏗️',desc:'Подземные бункеры военного стиля с уникальным лутом, ловушками и защитными механизмами.',addons:[]},
+    {name:'The Graveyard',emoji:'⚰️',desc:'Кладбища, катакомбы, мавзолеи с уникальными нежитью и лутом. Атмосферные ночные структуры.',addons:['Graveyard Biomes']},
+    {name:'FTB Quests',emoji:'📋',important:'recommended',desc:'Система квестов с деревом прогрессии и наградами. Даёт направление в прохождении сборки — куда идти и что делать дальше.',tips:['Открой книгу квестов в самом начале','Квесты дают редкие ресурсы как награду','FTB Teams — общий прогресс квестов для команды'],addons:['FTB Teams','FTB Library','Item Filters','FTB Xmod Compat']},
+    {name:'Bountiful',emoji:'📌',desc:'Доски объявлений с наградными заданиями — убить мобов, принести предметы. Хороший источник ресурсов на раннем этапе.',addons:[]},
+    {name:'Take a Pillage',emoji:'⚔️',desc:'Новые аутпосты пиллагеров с уникальными врагами и механиками захвата. Сложнее ванильных форпостов.',addons:[]},
+    {name:'Integrated Stronghold',emoji:'🏯',desc:'Переработанная Крепость Конца с новыми комнатами, ловушками и структурами. Достойное испытание перед финальным боссом.',addons:[]},
+  ],
+  biomes: [
+    {name:'Oh The Biomes You\'ll Go',emoji:'🌍',important:'recommended',desc:'Более 80 новых биомов для всех трёх измерений: экзотические леса, кристаллические долины, гниющие болота, небесные острова.',tips:['80+ биомов — мир никогда не повторяется','TerraBlender обязателен для правильной работы','Новые биомы есть во всех трёх измерениях'],addons:['TerraBlender']},
+    {name:'Tectonic',emoji:'⛰️',important:'recommended',desc:'Масштабный и реалистичный рельеф: горные хребты, глубокие долины, широкие плато. Полностью меняет ощущение масштаба мира.',tips:['Горы теперь действительно огромные','Рельеф выглядит как настоящий','Отлично с шейдерами и BYG'],addons:[]},
+    {name:'Better End',emoji:'🌌',desc:'Полный реворк измерения Края: десятки уникальных биомов, новые существа, растения, блоки. Делает Край по-настоящему интересным.',addons:['BetterEnd Cities']},
+    {name:'Better Nether',emoji:'🔥',desc:'Полный реворк Незера: десятки новых биомов с уникальной флорой, фауной и ресурсами. Незер перестаёт быть просто адом.',addons:['Cinderscapes','Bygone Nether']},
+    {name:'Regions Unexplored',emoji:'🗺️',desc:'20+ новых биомов для всех измерений: туманные редвудовые леса, арктические равнины, кислотные болота, магнолиевые рощи.',addons:[]},
+    {name:'Biomemakeover',emoji:'🌿',desc:'Улучшение визуала ванильных биомов: новые виды деревьев, разнообразие детализации, дополнительные растения и текстуры поверхности.',addons:[]},
+    {name:'Promenade',emoji:'🌸',desc:'Сезонные и пышные биомы: цветущие вишнёвые леса, осенние дубравы, заснеженные ели. Акцент на красоту и атмосферу.',addons:[]},
+    {name:'Aylyth',emoji:'🌑',desc:'Тёмный лесной биом с мрачной атмосферой, уникальными существами и особой магией. Опасен для неподготовленных путешественников.',addons:[]},
+    {name:'Paradise Lost',emoji:'☁️',desc:'Небесное измерение с плавающими островами, облачными лесами и уникальными ресурсами. Доступно через особый ритуал.',addons:[]},
+    {name:'The Bumblezone',emoji:'🐝',desc:'Измерение пчёл-великанов: огромные соты, медовые блоки, гигантские насекомые. Уникальный опыт и ресурсы.',addons:[]},
+    {name:'Galosphere',emoji:'💎',desc:'Ледяные пещеры с разноцветными кристаллами, новыми мобами и редкими ресурсами. Красивая и опасная подземная экосистема.',addons:[]},
+    {name:'Subterrestrial',emoji:'🪨',desc:'Подземные биомы с уникальными блоками, растениями и кристаллами. Делает глубокие пещеры разнообразными и интересными.',addons:[]},
+    {name:'Spelunkery',emoji:'⛏️',desc:'Пещерные формации: огромные сталактиты, кристаллические образования, подземные озёра. Улучшает визуал глубоких пещер.',addons:[]},
+    {name:'Geophilic',emoji:'🌾',desc:'Небольшие, но заметные улучшения ванильных биомов: новые цветы, камни, детали поверхности. Мир выглядит живее.',addons:[]},
+    {name:'Nox',emoji:'🌑',desc:'Тёмное измерение без естественного освещения. Настоящий хоррор — принеси свет или погибни в темноте.',addons:[]},
+    {name:'Dark Waters',emoji:'🌊',desc:'Глубокие опасные воды с уникальными морскими существами и секретами на дне. Исследование океана стало значительно опаснее.',addons:[]},
+    {name:'Swampier Swamps',emoji:'🐊',desc:'Расширение болотных биомов: более густые, туманные, заросшие. Новые растения и опасные условия.',addons:[]},
+    {name:'Falling Leaves',emoji:'🍂',desc:'Опадающие листья с деревьев в виде частиц. Красивая атмосферная деталь без влияния на производительность.',addons:[]},
+    {name:'River Redux',emoji:'🌊',desc:'Переработка рек: плавные изгибы, пороги, разные берега. Реки выглядят природными, а не прямолинейными.',addons:[]},
+    {name:'Nicer Skies',emoji:'🌤️',desc:'Улучшенный вид неба и облаков. Закаты, рассветы и ночное небо становятся значительно красивее.',addons:[]},
+  ],
+  mobs: [
+    {name:'Critters and Companions',emoji:'🦦',desc:'Новые дружелюбные животные: выдры, скарабеи, морские котики, мышки-полёвки, мальки. Все с уникальным поведением и взаимодействием.',addons:[]},
+    {name:'Ecologics',emoji:'🦜',desc:'Биомные животные — каждый биом получает характерную фауну: верблюды в пустыне, нарвалы в океане, белки в лесу, пеликаны у воды.',addons:[]},
+    {name:'Creeperoverhaul',emoji:'💚',desc:'Биомные крипперы с уникальной внешностью и поведением: заснеженный, джунглевый, пещерный, грибной. Каждый со своими особенностями.',addons:[]},
+    {name:'Endermanoverhaul',emoji:'👁️',desc:'Биомные эндерманы с уникальными текстурами и поведением в зависимости от измерения и биома.',addons:[]},
+    {name:'Better Animals Plus',emoji:'🐺',desc:'Реалистичные животные с детальными моделями: медведи гризли, акулы, тасманийские дьяволы, гремучие змеи, дикие индейки.',addons:[]},
+    {name:'Rotten Creatures',emoji:'🧟',desc:'Варианты зомби с биомными особенностями: болотные, пещерные, пустынные. Уникальный дроп и поведение.',addons:[]},
+    {name:'Whisperwoods',emoji:'🌙',desc:'Тёмные лесные духи и существа: призрачные волки, светящиеся олени, мрачные феи. Делают ночной лес жутким.',addons:[]},
+    {name:'Gigeresque',emoji:'👾',desc:'Ксеноморфы в стиле H.R. Giger — Чужой как мод для Minecraft. Лицехваты, пришельцы, кислотная кровь.',addons:[]},
+    {name:'The Orcs',emoji:'🗿',desc:'Орки как враждебная разумная раса: свои деревни, иерархия, уникальное оружие и доспехи. Серьёзная угроза.',addons:[]},
+    {name:'Minecells',emoji:'🏰',desc:'Существа и биомы из Dead Cells: ожившие темницы, уникальные монстры и трофейные предметы.',addons:[]},
+    {name:'Terrarian Slimes',emoji:'💚',desc:'Слаймы из Terraria с разными свойствами, цветами и дропом. Охота на слаймов становится выгоднее.',addons:[]},
+    {name:'Mutant Monsters',emoji:'💪',desc:'Мутировавшие версии ванильных мобов: гигантский зомби, взрывной скелет, огромный крипер — значительно сильнее оригиналов.',addons:[]},
+    {name:'Useless Reptile',emoji:'🦎',desc:'Рептилии-питомцы (ящерицы, черепахи) которых можно приручить, оседлать и использовать для транспортировки.',addons:[]},
+    {name:'EnderZoology',emoji:'🌌',desc:'Новые существа измерения Края: эндерские крабы, эндерский осьминог. Дополняет экосистему Края.',addons:[]},
+  ],
+  decor: [
+    {name:'Supplementaries',emoji:'🏮',desc:'Огромный набор декора: верёвки, фонари, флюгеры, полки, кувшины, вывески, монеты, кукурузные пугала. Более 60 новых предметов.',addons:['Supps Squared']},
+    {name:'Handcrafted',emoji:'🛋️',desc:'Мягкая мебель с детальными моделями: диваны, кресла, подушки, книжные полки, кухонные стулья. Настоящий уют в доме.',addons:[]},
+    {name:'Another Furniture',emoji:'🪑',desc:'Дополнительная мебель с богатой кастомизацией цветов и материалов. Ванные принадлежности, обеденные столы, кровати.',addons:[]},
+    {name:'Chisel',emoji:'🪨',desc:'Более 100 вариантов тёсаных блоков из одного материала: плитка, кирпич, кружева, узоры. Для детальных построек.',addons:['Rechiseled','Rechiseled Create']},
+    {name:'Twigs',emoji:'🪵',desc:'Деревянный декор: несущие балки, каменные колонны, пешеходные мостики, декоративные таблички. Строительный набор.',addons:[]},
+    {name:'Decorative Blocks',emoji:'🏗️',desc:'Балки, решётки, столбы, карнизы, опоры. Детали для реалистичных построек в любом стиле.',addons:[]},
+    {name:'Catwalks Inc',emoji:'🔩',desc:'Промышленные мостки, лестницы, перила, решётчатые полы. Идеально для заводов и индустриальных построек.',addons:[]},
+    {name:'Stoneworks',emoji:'🏛️',desc:'Каменные архитектурные детали: арки, карнизы, пилястры, медальоны. Для монументальных построек.',addons:[]},
+    {name:'Framed Blocks',emoji:'🖼️',desc:'Блоки-рамки с заменяемыми текстурами: одна форма (ступени, слэб, забор) — любая текстура. Безграничная кастомизация.',addons:[]},
+    {name:'Factory Blocks',emoji:'🏭',desc:'Промышленные блоки в стиле стимпанк: металлические панели, трубы, решётки, клапаны.',addons:[]},
+    {name:'Simply Light',emoji:'💡',desc:'Минималистичные и красивые источники света: бумажные лампы, неоновые трубки, точечные светильники.',addons:[]},
+    {name:'Arcane Lanterns',emoji:'🏮',desc:'Магические фонари разных цветов с мистическим свечением. Освещение для любого магического биома.',addons:[]},
+    {name:'Block Swap',emoji:'🔄',desc:'Меняй блоки на их варианты правым кликом — камень на брусчатку, дерево на доски. Без разрушения.',addons:[]},
+    {name:'Diagonal Fences',emoji:'🚧',desc:'Заборы соединяются по диагонали, образуя плавные кривые линии. Делает ограды визуально приятными.',addons:[]},
+    {name:'Double Doors',emoji:'🚪',desc:'Двойные двери автоматически открываются и закрываются вместе. Наконец-то нет нужды открывать каждую створку.',addons:[]},
+  ],
+  food: [
+    {name:'Farmer\'s Delight',emoji:'🍳',important:'recommended',desc:'Расширенная система питания: 50+ блюд, нарезка ингредиентов на разделочной доске, приготовление в казанке. Каждое блюдо с уникальными бонусами.',tips:['Готовь сложные блюда для боевых бонусов','Slice and Dice — автоматизируй кухню через Create','Farmersrespite: кофе и чай дают постоянные эффекты'],addons:['Farmersrespite','Farmer\'s Knives','Nether\'s Delight','Delightful Creators','Slice and Dice','Respite Creators']},
+    {name:'Diet',emoji:'🥗',desc:'Система сбалансированного питания: 5 групп нутриентов. Сбалансированная диета даёт бонусы к здоровью, скорости и урону.',addons:[]},
+    {name:'Comforts',emoji:'🛌',desc:'Спальные мешки и гамаки — спи где угодно без установки точки возрождения. Удобно для исследования.',addons:[]},
+    {name:'Neepmeat',emoji:'🥩',desc:'Мясистые корнеплоды — странная органика для крафта особых блюд и зелий. Нишевый ингредиент для поздней игры.',addons:[]},
+    {name:'Right Click Harvest',emoji:'🌾',desc:'Собирай созревшие культуры правым кликом без разрушения растения. Фермерство стало в разы удобнее.',addons:[]},
+  ],
+  storage: [
+    {name:'Applied Energistics 2',emoji:'💻',desc:'МЕ-сеть: хранение в цифровом виде, автокрафт, сортировка через интерфейсы. Самая мощная система организации в сборке.',addons:['Mega Cells']},
+    {name:'Extended Drawers',emoji:'🗄️',important:'recommended',desc:'Выдвижные ящики для хранения больших количеств одного вида предмета. Компактно, быстро, удобно для ферм.',tips:['Один ящик = миллионы единиц одного предмета','Ставь рядом с AE2 для автосортировки','Идеальны для ферм мобов и зерна'],addons:[]},
+    {name:'Traveler\'s Backpack',emoji:'🎒',important:'recommended',desc:'Рюкзак с инвентарём, встроенными флягами для жидкостей и слотами для инструментов. Открывается на клавишу B.',tips:['B — открыть рюкзак в любой момент','Встроенные фляги хранят лаву и воду','Слоты инструментов — быстрый доступ к пикосу и мечу'],addons:[]},
+    {name:'EnderChests',emoji:'📦',desc:'Личные эндер-сундуки с несколькими каналами. Приватное хранилище доступное из любой точки мира.',addons:[]},
+    {name:'Trash Cans',emoji:'🗑️',desc:'Мусорные корзины для необратимого удаления предметов, жидкостей и энергии. Удобнее, чем лава.',addons:[]},
+    {name:'Compressor',emoji:'🔧',desc:'Компрессует предметы в блоки и декомпрессует обратно автоматически. Экономия места в хранилище.',addons:[]},
+  ],
+  qol: [
+    {name:'JourneyMap',emoji:'🗺️',desc:'Полная карта мира в реальном времени, миникарта, точки интереса, вейпоинты. Лучшая карта для Fabric. Открывается на M.',addons:[]},
+    {name:'Jade',emoji:'🔍',desc:'WAILA — информация о блоках и мобах при наведении: состав, содержимое, здоровье, владелец. Незаменим при изучении новых модов.',addons:[]},
+    {name:'REI (Roughly Enough Items)',emoji:'📖',desc:'Просмотр рецептов крафта, плавки и других процессов для всех 10000+ предметов в сборке. Заменяет NEI/JEI.',addons:[]},
+    {name:'Inventory Profiles Next',emoji:'🔀',desc:'Сортировка инвентаря одной кнопкой, автопополнение расходуемого в хотбаре, быстрый переброс экипировки.',addons:[]},
+    {name:'Mouse Tweaks',emoji:'🖱️',desc:'Удобные операции мышью в инвентаре: мотание колесом для раскладки, быстрое заполнение.',addons:[]},
+    {name:'AppleSkin',emoji:'🍎',desc:'Отображение точного значения насыщения и восстановления здоровья при наведении на еду. Планируй питание.',addons:[]},
+    {name:'Equipment Compare',emoji:'⚖️',desc:'Сравнение брони и оружия с надетым при наведении — удерживай Shift. Разница в статах видна сразу.',addons:[]},
+    {name:'Zoomify',emoji:'🔭',desc:'Плавный зум-инструмент с анимацией. Привязан на F4. Поддерживает плавное масштабирование колесом.',addons:[]},
+    {name:'Ping Wheel',emoji:'📍',desc:'Колесо меток для быстрой коммуникации в команде. Удерживай U — выбери метку — укажи направление.',addons:[]},
+    {name:'Controlling',emoji:'⌨️',desc:'Поиск и редактирование биндов в настройках управления. Позволяет найти конфликты и назначить новые клавиши.',addons:[]},
+    {name:'Crafting Tweaks',emoji:'🔨',desc:'Дополнительные кнопки в интерфейсе верстака: балансировка ресурсов, очистка, ротация паттернов.',addons:[]},
+    {name:'Patchouli',emoji:'📚',desc:'Движок для внутриигровых книг-гайдов. Используется другими модами для объяснения своих механик.',addons:[]},
+    {name:'EnchantmentDescriptions',emoji:'✨',desc:'Читаемое описание каждого зачарования прямо в тултипе. Больше не нужно гуглить что делает «Проворство».',addons:[]},
+    {name:'LegendaryTooltips',emoji:'📜',desc:'Красивые рамки и стили тултипов для редких и легендарных предметов. Артефакты выглядят действительно особенными.',addons:[]},
+    {name:'NoChatReports',emoji:'🔒',desc:'Отключает систему жалоб Mojang на чат-сообщения. Конфиденциальность переписки.',addons:[]},
+    {name:'Voice Chat',emoji:'🎙️',desc:'Simple Voice Chat — голосовой чат в игре. PTT на V, мут на запятую. Поддерживает группы и шёпот.',addons:[]},
+    {name:'ModMenu',emoji:'📋',desc:'Список всех установленных модов с доступом к их настройкам прямо из паузы.',addons:[]},
+    {name:'Held Item Info',emoji:'ℹ️',desc:'Краткая подсказка о предмете в руке — название и ключевые атрибуты без открытия инвентаря.',addons:[]},
+    {name:'PickUp Notifier',emoji:'🔔',desc:'Уведомление в чате о каждом подобранном предмете. Никогда не пропустишь редкий дроп.',addons:[]},
+  ],
+  visual: [
+    {name:'Iris',emoji:'🌟',important:'recommended',desc:'Поддержка шейдерпаков в Fabric — подключи Complementary, BSL или любой OptiFine-совместимый пак. Полное преображение визуала.',addons:[]},
+    {name:'Not Enough Animations',emoji:'🏃',desc:'Анимации от первого лица: лазание по лестницам, плавание, чтение карты, натягивание лука. Движения персонажа от 3-го лица тоже улучшены.',addons:[]},
+    {name:'Eating Animation',emoji:'😋',desc:'Анимация жевания и поедания пищи видна в руке. Каждый тип еды имеет свою анимацию.',addons:[]},
+    {name:'Entity Model Features',emoji:'🎨',desc:'Кастомные 3D-модели мобов из ресурспаков. Полная поддержка OptiFine-моделей.',addons:[]},
+    {name:'Entity Texture Features',emoji:'🖼️',desc:'Случайные текстуры для мобов (каждый крипер чуть другой), эмиссия, свечение глаз, биомные варианты.',addons:[]},
+    {name:'3D Skin Layers',emoji:'👤',desc:'Объёмные слои скина вместо плоских. Шляпы, куртки и накидки имеют реальную толщину.',addons:[]},
+    {name:'Wavy Capes',emoji:'🧣',desc:'Плащ реалистично развевается на ветру и при движении. Физика ткани.',addons:[]},
+    {name:'Presence Footsteps',emoji:'👣',desc:'Звуки шагов зависят от поверхности, скорости, обуви. Разные звуки для камня, дерева, снега, воды, металла.',addons:[]},
+    {name:'AmbientSounds',emoji:'🎵',important:'recommended',desc:'Окружающие звуки биомов: ветер в горах, пение птиц в лесу, капли в пещерах, шум моря. Огромная атмосфера.',addons:[]},
+    {name:'Enhanced Visuals',emoji:'💫',desc:'Экранные эффекты: кровь при ударе, огонь, дождь на стекле экрана, эффект опьянения. Иммерсивность.',addons:[]},
+    {name:'Visuality',emoji:'✨',desc:'Дополнительные визуальные частицы: искры от ударов, кровь мобов, листья при падении. Бои стали зрелищнее.',addons:[]},
+    {name:'Lambda Dynamic Lights',emoji:'🔦',important:'recommended',desc:'Динамическое освещение от предметов в руке: факел, магма-крем, горящие предметы светят в темноте.',addons:[]},
+    {name:'Continuity',emoji:'🧱',desc:'Связанные текстуры — блоки одного типа рядом сливаются в единое целое. Как CTM в OptiFine.',addons:[]},
+    {name:'CIT Resewn',emoji:'🎭',desc:'Кастомные текстуры предметов по NBT-тегам (имя, зачарование). Переименованный меч получает уникальный вид.',addons:[]},
+    {name:'Lambda Better Grass',emoji:'🌱',desc:'Трава переходит на боковые грани блоков рядом. Земля с травой выглядит целостно как в OptiFine.',addons:[]},
+    {name:'Animatica',emoji:'🎬',desc:'Поддержка анимированных текстур из ресурспаков. Анимации воды, лавы, порталов из паков работают.',addons:[]},
+    {name:'Item Physic',emoji:'🌀',desc:'Предметы на земле вращаются и падают с физикой вместо плоского спрайта. Красиво и иммерсивно.',addons:[]},
+    {name:'Emotecraft',emoji:'💃',desc:'Эмоции и анимации персонажа: танцы, жесты, приветствия. Видны другим игрокам в мультиплеере.',addons:[]},
+    {name:'Chat Heads',emoji:'💬',desc:'Аватарка скина игрока отображается рядом с сообщением в чате. Легко понять кто написал.',addons:[]},
+    {name:'FancyMenu',emoji:'🖼️',desc:'Полная замена главного меню: кастомные фоны, анимации, видео, кнопки. Сборка имеет свой уникальный экран.',addons:[]},
+    {name:'Drippy Loading Screen',emoji:'⌛',desc:'Кастомный экран загрузки мира с прогресс-баром и декорациями вместо стандартного.',addons:[]},
+    {name:'Blur',emoji:'🔵',desc:'Размытие фона при открытом инвентаре или меню. Элегантная деталь, улучшающая читаемость интерфейса.',addons:[]},
+    {name:'YouDied',emoji:'💀',desc:'Кастомный экран смерти с информацией о причине и красивой анимацией.',addons:[]},
+    {name:'Traveler\'s Titles',emoji:'📜',desc:'Красивые заголовки при входе в биом или измерение с названием и подзаголовком.',addons:[]},
+    {name:'Seamless Loading Screen',emoji:'🌊',desc:'Плавный переход при загрузке мира — экран не мигает, переход анимирован.',addons:[]},
+  ]
+};
+
+// ── SOUND SYSTEM ─────────────────────────────────────────────────────────────
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function tone(freq, type, vol, dur, rampTo) {
+  try {
+    const a=getAudio(), o=a.createOscillator(), g=a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.type=type; o.frequency.setValueAtTime(freq,a.currentTime);
+    if (rampTo) o.frequency.exponentialRampToValueAtTime(rampTo, a.currentTime+dur);
+    g.gain.setValueAtTime(vol,a.currentTime); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+dur);
+    o.start(); o.stop(a.currentTime+dur);
+  } catch(e){}
+}
+function playHover()  { tone(900,'sine',.05,.1,1200); }
+function playClick()  { tone(380,'triangle',.1,.15,120); }
+function playOpen()   { tone(440,'sine',.07,.12,660); setTimeout(()=>tone(660,'sine',.05,.12,880),80); }
+function playClose()  { tone(550,'sine',.06,.12,330); }
+function playNav()    { tone(600,'triangle',.07,.1,800); }
+function playFilter() { tone(700,'square',.04,.1,1000); }
+function playSwipe()  { tone(300,'sine',.08,.15,500); }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+const catColors = {opt:'#22c55e',tech:'#e8943a',magic:'#9d4edd',combat:'#ef4444',explore:'#2dd4bf',biomes:'#22c55e',mobs:'#eab308',decor:'#ec4899',food:'#eab308',storage:'#60a5fa',qol:'#2dd4bf',visual:'#fb7185'};
+const catNames   = {opt:'Оптимизация',tech:'Техника',magic:'Магия',combat:'Боёвка',explore:'Исследование',biomes:'Биомы',mobs:'Мобы',decor:'Декор',food:'Еда',storage:'Хранение',qol:'QoL / UI',visual:'Визуал'};
+const impLabels  = {critical:'⚠ Критический'};
+
+function renderCards(id, mods, color) {
+  const grid = document.getElementById('g-' + id);
+  if (!grid) return;
+  grid.style.setProperty('--section-color', color);
+  mods.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.dataset.name = (m.name + ' ' + (m.tips||[]).join(' ')).toLowerCase();
+    div.dataset.desc = m.desc.toLowerCase();
+    div.dataset.category = id;
+    div.dataset.importance = m.important || '';
+    div.style.setProperty('--section-color', color);
+    const impBadge = m.important ? `<div class="card-imp ${m.important}">${impLabels[m.important]}</div>` : '';
+    div.innerHTML = `
+      <div class="card-emoji">${m.emoji}</div>
+      <div class="card-name">${m.name}</div>
+      <div class="card-desc">${m.desc}</div>
+      ${m.addons&&m.addons.length ? `<div class="card-addons">${m.addons.map(a=>`<span class="addon-tag">+ ${a}</span>`).join('')}</div>` : ''}
+      ${impBadge}
+    `;
+    div.addEventListener('click', () => { openWiki(m, id, color); playOpen(); });
+    div.addEventListener('mousemove', e => {
+      const r = div.getBoundingClientRect();
+      div.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100)+'%');
+      div.style.setProperty('--my', ((e.clientY-r.top)/r.height*100)+'%');
+    });
+    div.addEventListener('mouseenter', playHover);
+    div.addEventListener('mousemove', e => {
+      const r = div.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+      div.style.transform=`translateY(-3px) rotateX(${-y*4}deg) rotateY(${x*4}deg)`;
+    });
+    div.addEventListener('mouseleave', () => { div.style.transform=''; });
+    grid.appendChild(div);
+  });
+}
+
+Object.entries(DATA).forEach(([id, mods]) => renderCards(id, mods, catColors[id]||'#e8943a'));
+
+// ── WIKI PANEL ───────────────────────────────────────────────────────────────
+const wikiPanel = document.getElementById('wiki-panel');
+const wikiDim   = document.getElementById('wiki-dim');
+
+function openWiki(m, catId, color) {
+  document.getElementById('wp-emoji').textContent = m.emoji;
+  document.getElementById('wp-title').textContent = m.name;
+  const catEl = document.getElementById('wp-cat');
+  catEl.textContent = catNames[catId]||catId;
+  catEl.style.color = color; catEl.style.borderColor = color;
+  const impEl = document.getElementById('wp-imp');
+  if (m.important) {
+    impEl.textContent = impLabels[m.important];
+    impEl.className = 'wiki-imp ' + m.important;
+    impEl.style.display = '';
+  } else { impEl.style.display = 'none'; }
+  document.getElementById('wp-desc').textContent = m.desc;
+  const tipsWrap = document.getElementById('wp-tips-wrap');
+  const tipsList = document.getElementById('wp-tips');
+  if (m.tips && m.tips.length) {
+    tipsList.innerHTML = m.tips.map(t=>`<li class="wiki-tip"><span class="wiki-tip-dot">✦</span><span class="wiki-tip-t">${t}</span></li>`).join('');
+    tipsWrap.style.display = '';
+  } else { tipsWrap.style.display = 'none'; }
+  const addonsWrap = document.getElementById('wp-addons-wrap');
+  const addonsList = document.getElementById('wp-addons');
+  if (m.addons && m.addons.length) {
+    addonsList.innerHTML = m.addons.map(a=>`<span class="wiki-addon-tag">+ ${a}</span>`).join('');
+    addonsWrap.style.display = '';
+  } else { addonsWrap.style.display = 'none'; }
+  wikiPanel.scrollTop = 0;
+  wikiPanel.classList.add('open');
+  wikiDim.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeWiki() {
+  wikiPanel.classList.remove('open');
+  wikiDim.classList.remove('show');
+  document.body.style.overflow = '';
+  playClose();
+}
+
+document.getElementById('wiki-close').addEventListener('click', closeWiki);
+wikiDim.addEventListener('click', closeWiki);
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeWiki(); });
+
+// ── DESKTOP SEARCH ────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.card').forEach(card => {
+    const match = !q || card.dataset.name.includes(q) || card.dataset.desc.includes(q);
+    card.classList.toggle('hidden', !match);
+  });
+  document.querySelectorAll('.card-grid').forEach(g => {
+    let nr = g.querySelector('.no-results');
+    const vis = [...g.querySelectorAll('.card')].some(c=>!c.classList.contains('hidden'));
+    if (!vis && q) {
+      if (!nr) { nr=document.createElement('div'); nr.className='no-results'; nr.textContent='Нет совпадений'; g.appendChild(nr); }
+    } else if (nr) nr.remove();
+  });
+});
+
+// ── MOBILE SEARCH ─────────────────────────────────────────────────────────────
+const msOverlay = document.getElementById('msearch-overlay');
+const msInput   = document.getElementById('ms-input');
+const msResults = document.getElementById('ms-results');
+
+function openMSearch() {
+  msOverlay.classList.add('open');
+  msInput.value = '';
+  renderMResults('');
+  requestAnimationFrame(()=>msInput.focus());
+  playNav();
+}
+function closeMSearch() {
+  msOverlay.classList.remove('open');
+}
+document.getElementById('fab-search').addEventListener('click', openMSearch);
+document.getElementById('ms-close').addEventListener('click', closeMSearch);
+
+function renderMResults(q) {
+  const all = [];
+  Object.entries(DATA).forEach(([catId, mods]) => {
+    mods.forEach(m => {
+      const hay = (m.name+' '+m.desc+' '+(m.tips||[]).join(' ')).toLowerCase();
+      if (!q || hay.includes(q)) all.push({m, catId});
+    });
+  });
+  if (!all.length) {
+    msResults.innerHTML = `<div class="ms-empty">Ничего не найдено по «${q}»</div>`;
+    return;
+  }
+  msResults.innerHTML = all.slice(0,40).map(({m,catId}) => {
+    const color = catColors[catId]||'#e8943a';
+    return `<div class="ms-result-item" data-cat="${catId}" data-name="${m.name}">
+      <div class="ms-result-emoji">${m.emoji}</div>
+      <div class="ms-result-info">
+        <div class="ms-result-name">${highlight(m.name,q)}</div>
+        <div class="ms-result-cat" style="color:${color}">${catNames[catId]||catId}</div>
+        <div class="ms-result-desc">${m.desc.substring(0,80)}…</div>
+      </div>
+    </div>`;
+  }).join('');
+  msResults.querySelectorAll('.ms-result-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const catId = el.dataset.cat;
+      const name  = el.dataset.name;
+      const mods  = DATA[catId]||[];
+      const mod   = mods.find(m=>m.name===name);
+      if (mod) { closeMSearch(); openWiki(mod, catId, catColors[catId]||'#e8943a'); playOpen(); }
+    });
+  });
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>');
+}
+
+msInput.addEventListener('input', e => renderMResults(e.target.value.toLowerCase().trim()));
+
+// ── FILTER CHIPS ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.fchip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active','violet','red','teal','green','pink','amber'));
+    const col = chip.dataset.color || '';
+    chip.classList.add('active'); if (col) chip.classList.add(col);
+    const filter = chip.dataset.filter;
+    document.querySelectorAll('.card').forEach(card => {
+      let show = true;
+      if (filter==='all') show=true;
+      else if (filter==='critical') show = card.dataset.importance==='critical';
+      else if (filter==='recommended') show = card.dataset.importance==='critical';
+      else show = card.dataset.category===filter;
+      card.classList.toggle('hidden', !show);
+    });
+    document.querySelectorAll('.card-grid').forEach(g => {
+      let nr = g.querySelector('.no-results');
+      const vis=[...g.querySelectorAll('.card')].some(c=>!c.classList.contains('hidden'));
+      if (!vis) { if(!nr){nr=document.createElement('div');nr.className='no-results';nr.textContent='Нет модов в этой категории';g.appendChild(nr);} }
+      else if (nr) nr.remove();
+    });
+    playFilter();
+    if (filter!=='all'&&filter!=='critical') {
+      const anchor = document.getElementById(filter);
+      if (anchor) anchor.scrollIntoView({behavior:'smooth'});
+    }
+  });
+});
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+const ANCHORS = ['opt','tech','magic','combat','explore','biomes','mobs','decor','food','storage','qol','visual','keybinds'];
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth'});
+}
+
+document.querySelectorAll('.nav-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    scrollToSection(btn.dataset.target); playNav();
+    document.querySelectorAll('.nav-pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.mnav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    scrollToSection(btn.dataset.target); playNav();
+    document.querySelectorAll('.mnav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+function updateActiveNav(current) {
+  document.querySelectorAll('.nav-pill').forEach(b=>b.classList.toggle('active', b.dataset.target===current));
+  document.querySelectorAll('.mnav-btn').forEach(b=>b.classList.toggle('active', b.dataset.target===current));
+  const idx = ANCHORS.indexOf(current);
+  document.querySelectorAll('.sdot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+}
+
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('nav');
+  if (nav) nav.classList.toggle('scrolled', window.scrollY>80);
+  document.getElementById('btt').classList.toggle('show', window.scrollY>400);
+  let current = ANCHORS[0];
+  ANCHORS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 140) current = id;
+  });
+  updateActiveNav(current);
+}, {passive:true});
+
+document.getElementById('btt').addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// ── SECTION DOTS ──────────────────────────────────────────────────────────────
+const sdots = document.getElementById('sdots');
+ANCHORS.forEach((id,i)=>{
+  const d=document.createElement('div'); d.className='sdot'+(i===0?' active':'');
+  d.addEventListener('click',()=>{ scrollToSection(id); playNav(); });
+  sdots.appendChild(d);
+});
+
+// ── MOBILE SWIPE ──────────────────────────────────────────────────────────────
+let tStartX=0, tStartY=0, tStartTime=0;
+document.addEventListener('touchstart', e => {
+  if (msOverlay.classList.contains('open') || wikiPanel.classList.contains('open')) return;
+  tStartX = e.touches[0].clientX;
+  tStartY = e.touches[0].clientY;
+  tStartTime = Date.now();
+}, {passive:true});
+
+document.addEventListener('touchend', e => {
+  if (msOverlay.classList.contains('open') || wikiPanel.classList.contains('open')) return;
+  const dx = e.changedTouches[0].clientX - tStartX;
+  const dy = e.changedTouches[0].clientY - tStartY;
+  const dt = Date.now() - tStartTime;
+  if (Math.abs(dx) < 55 || Math.abs(dy) > Math.abs(dx)*0.8 || dt > 500) return;
+  let current = ANCHORS[0];
+  ANCHORS.forEach(id => {
+    const el=document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop-140) current=id;
+  });
+  let idx = ANCHORS.indexOf(current);
+  if (dx < 0) idx = Math.min(idx+1, ANCHORS.length-1);
+  else idx = Math.max(idx-1, 0);
+  const nextId = ANCHORS[idx];
+  scrollToSection(nextId);
+  playSwipe();
+  const flash = document.getElementById('swipe-flash');
+  flash.textContent = catNames[nextId] || nextId;
+  flash.classList.add('show');
+  setTimeout(()=>flash.classList.remove('show'), 900);
+}, {passive:true});
+
+// ── SCROLL REVEAL ──────────────────────────────────────────────────────────────
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target);} });
+}, {threshold:0.04});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// ── CURSOR ────────────────────────────────────────────────────────────────────
+const cur  = document.getElementById('cursor');
+const curR = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+if (cur) {
+  document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+  (function animCursor(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; curR.style.left=rx+'px'; curR.style.top=ry+'px'; requestAnimationFrame(animCursor); })();
+}
+
+// ── PARTICLES ──────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('particles');
+const ctx2   = canvas.getContext('2d');
+let W, H;
+const RUNES  = ['✦','⬡','◈','✧','⟡','ᚱ','ᚢ','ᚦ','ᚷ','ᛁ'];
+const PCOLS  = ['rgba(232,148,58,','rgba(157,78,221,','rgba(45,212,191,','rgba(255,255,255,'];
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+const pCount = isMobile ? 30 : 90;
+
+function resizeCanvas(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+
+const pts = Array.from({length:pCount}, ()=>({
+  x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+  vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+  size:Math.random()*10+5, alpha:Math.random()*.4+.04,
+  color:PCOLS[Math.floor(Math.random()*PCOLS.length)],
+  rune:Math.random()>.6?RUNES[Math.floor(Math.random()*RUNES.length)]:null,
+  drift:Math.random()*Math.PI*2, driftSpeed:(Math.random()-.5)*.003
+}));
+let pmx=9999,pmy=9999;
+document.addEventListener('mousemove', e=>{pmx=e.clientX;pmy=e.clientY;}, {passive:true});
+
+(function drawParticles(){
+  ctx2.clearRect(0,0,W,H);
+  pts.forEach(p=>{
+    p.drift+=p.driftSpeed;
+    p.x+=p.vx+Math.sin(p.drift)*.2; p.y+=p.vy+Math.cos(p.drift)*.15;
+    if(!isMobile){const dx=pmx-p.x,dy=pmy-p.y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){p.x-=dx/d*1.8;p.y-=dy/d*1.8;}}
+    if(p.x<-20)p.x=W+20; if(p.x>W+20)p.x=-20;
+    if(p.y<-20)p.y=H+20; if(p.y>H+20)p.y=-20;
+    ctx2.save(); ctx2.globalAlpha=p.alpha;
+    if(p.rune){ ctx2.fillStyle=p.color+'1)'; ctx2.font=`${p.size}px serif`; ctx2.textAlign='center'; ctx2.textBaseline='middle'; ctx2.fillText(p.rune,p.x,p.y); }
+    else{ ctx2.beginPath(); ctx2.arc(p.x,p.y,p.size*.3,0,Math.PI*2); ctx2.fillStyle=p.color+'.8)'; ctx2.shadowBlur=8; ctx2.shadowColor=p.color+'1)'; ctx2.fill(); }
+    ctx2.restore();
+  });
+  requestAnimationFrame(drawParticles);
+})();
+
+// ── LOADER ────────────────────────────────────────────────────────────────────
+setTimeout(()=>{
+  const l=document.getElementById('loader');
+  l.classList.add('gone');
+  setTimeout(()=>l.remove(),900);
+}, 2800);
+</script>
+</body>
+</html>
