@@ -461,13 +461,13 @@ mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
 const SEASONS=[
   {id:'rasy',num:'01',name:'Расы',status:'past',badge:'⏮ Прошлый сезон',color:'#c026d3',emoji:'👁️',
    desc:'Промежуточный сезон. Мир рас и происхождений — каждый игрок выбирал расу со своими способностями, ограничениями и мировоззрением.',
-   download:'https://workupload.com/file/4p4DDX7Xy83',full:false},
+   download:'https://workupload.com/file/4p4DDX7Xy83',full:true,renderer:'rasy'},
   {id:'jojo',num:'02',name:'Джоджо',status:'current',badge:'▶ Текущий сезон',color:'#f5b700',emoji:'✨',
    desc:'Стэнды, силы и яростные противостояния. Сезон вдохновлён вселенной JoJo\'s Bizarre Adventure — каждый игрок обладает уникальным стэндом.',
-   download:'https://drive.google.com/uc?export=download&id=1iyP6QH3UeK9iUtLUjBMlCCbV25yq1Z2J',full:false},
+   download:'https://drive.google.com/uc?export=download&id=1iyP6QH3UeK9iUtLUjBMlCCbV25yq1Z2J',full:true,renderer:'jojo'},
   {id:'mvt',num:'03',name:'Маги vs Техники',status:'next',badge:'⏭ Следующий сезон',color:'#7c3aed',emoji:'⚔️',
    desc:'425 модов. Две фракции — магическая и технологическая. Выбери сторону и построй лучший мир. Полная энциклопедия модов уже доступна.',
-   download:'https://workupload.com/file/NtZwrRaQ7w3',full:true}
+   download:'https://workupload.com/file/NtZwrRaQ7w3',full:true,renderer:'mvt'}
 ];
 
 // ─── MOD DATA (МвТ) ──────────────────────────────────────────────────────────
@@ -750,6 +750,244 @@ Object.entries(DATA).forEach(([cid,mods])=>{
   });});
 });
 
+// ─── РАСЫ DATA ───────────────────────────────────────────────────────────────
+const DATA_RASY={
+  opt:[
+    {name:'Sodium',emoji:'⚡',important:'critical',desc:'Полная замена ванильного рендерера. Даёт 200–400% прироста FPS.',tips:['Без этого мода сборка теряет 40–60% FPS','Indium обязателен для совместимости с Iris'],addons:['Indium']},
+    {name:'Lithium',emoji:'⚙️',important:'critical',desc:'Оптимизация логики: поиск пути, тики, физика блоков. Снижает нагрузку на CPU.',addons:[]},
+    {name:'Starlight',emoji:'✨',important:'critical',desc:'Переписанный движок освещения. Устраняет лаги при распространении света.',addons:[]},
+    {name:'C2ME',emoji:'🔀',important:'critical',desc:'Многопоточная генерация чанков — задействует все ядра CPU.',addons:[]},
+    {name:'FerriteCore',emoji:'💾',important:'critical',desc:'Снижает потребление RAM на 20–30%. Критично при большом числе модов.',addons:[]},
+    {name:'ModernFix',emoji:'🔧',important:'recommended',desc:'30+ фиксов: ускорение запуска, уменьшение RAM, исправление утечек.',addons:[]},
+    {name:'EntityCulling',emoji:'👁️',important:'recommended',desc:'Прекращает рендер сущностей вне поля зрения. +30–60% FPS.',addons:[]},
+    {name:'LazyDFU',emoji:'⏳',important:'recommended',desc:'Откладывает инициализацию DFU. Ускоряет запуск на 10–30 секунд.',addons:[]},
+    {name:'Dynamic FPS',emoji:'🔋',desc:'Снижает FPS до 1 когда окно не в фокусе.',addons:[]},
+    {name:'ImmediatelyFast',emoji:'🖥️',desc:'Оптимизация GUI, частиц, текста.',addons:[]},
+    {name:'Chunky',emoji:'🗺️',important:'recommended',desc:'Предгенерация чанков командой /chunky start.',tips:['Запусти /chunky start перед первым заходом'],addons:[]},
+    {name:'Alternate Current',emoji:'🔴',desc:'Переписанная система редстоуна. В 10–50x быстрее при больших схемах.',addons:[]},
+    {name:'Spark',emoji:'📊',desc:'Продвинутый профайлер. /spark profiler.',addons:[]},
+    {name:'BetterBiomeBlend',emoji:'🌈',desc:'Плавные переходы цветов биомов без просадок FPS.',addons:[]},
+    {name:'CullLessLeaves',emoji:'🍃',desc:'Прореживание листьев вдали от игрока.',addons:[]},
+  ],
+  races:[
+    {name:'Origins',emoji:'👁️',important:'critical',desc:'Главный мод системы рас. При первом входе игрок выбирает происхождение с уникальными способностями и ограничениями.',tips:['Выбор расы происходит при первом входе в мир','Расу можно сменить через Orb of Origin — одноразовый'],addons:['Apoli','Extra Origins','Origins: Classes','Calio']},
+    {name:'Apoli',emoji:'⚙️',important:'critical',desc:'Движок способностей Origins. Обязательная зависимость — без него Origins не работает.',addons:[]},
+    {name:'Extra Origins',emoji:'🌟',important:'recommended',desc:'12 дополнительных рас: Мерлинг (дыхание под водой), Призрак (сквозь блоки), Паук (лазить по стенам).',tips:['Мерлинг — лучший выбор для исследователей океана'],addons:['Apoli']},
+    {name:'Origins: Classes',emoji:'🎭',important:'recommended',desc:'Система классов поверх рас: Воин, Маг, Следопыт, Знахарь. Каждый класс усиливает определённые расовые способности.',addons:['Apoli']},
+    {name:'Pehkui',emoji:'📐',desc:'Изменение масштаба игрока. Используется расами с другим размером тела.',addons:[]},
+    {name:'Calio',emoji:'✨',desc:'Дополнительные расы с нестандартными механиками: Сирена, Нага, Скиталец.',addons:['Apoli']},
+    {name:'Savage Origins',emoji:'💀',desc:'Расы с жёсткими ограничениями: Эндерман (урон от воды), Зомби (горит на солнце). Для хардкорщиков.',addons:['Apoli']},
+    {name:'Human+',emoji:'👤',desc:'Улучшенная человеческая раса с прогрессией атрибутов и уникальными пассивными умениями.',addons:['Apoli']},
+    {name:'Orb of Origins',emoji:'🔮',desc:'Предмет для смены расы. Одноразовый — используй обдуманно.',addons:[]},
+    {name:'Origins: Enderian',emoji:'🌑',desc:'Полноценная раса Эндермена: телепортация, чувствительность к воде, ненависть мобов.',addons:['Apoli']},
+  ],
+  magic:[
+    {name:'Ars Nouveau',emoji:'📖',important:'recommended',desc:'Магия рисованием заклинаний в книге заклинателя. Создавай комбинации: призыв, щит, телепорт, взрыв.',tips:['Начни с Novice Spellbook и базовых форм','Ars Elemental добавляет стихийные источники'],addons:['Ars Elemental','Ars Creo']},
+    {name:'Botania',emoji:'🌸',desc:'Магическая техника на основе маны из цветов. Без электричества — только природные механизмы.',addons:['KubeJS Botania']},
+    {name:'Hexcasting',emoji:'🔮',desc:'Паттерны заклинаний — тьюринг-полный магический язык. Рисуй в воздухе посохом.',tips:['Hexgloop добавляет удобное колесо заклинаний (N)'],addons:['Hexal','Hexgloop']},
+    {name:'Roots',emoji:'🌿',desc:'Природная магия: ритуалы на земле, зелья из трав, гримуар. Лёгкий старт без долгой прогрессии.',addons:[]},
+    {name:'Enchantment Descriptions',emoji:'📜',desc:'Описания всех зачарований прямо в JEI. Больше не нужно ничего гуглить.',addons:[]},
+    {name:'Mystical Agriculture',emoji:'🌾',desc:'Выращивай ресурсы как культуры: железо, золото, алмазы — всё на грядке.',addons:[]},
+  ],
+  combat:[
+    {name:'Better Combat',emoji:'⚔️',important:'recommended',desc:'Новая боёвая система: combo-атаки, уникальные паттерны для каждого типа оружия, анимации.',tips:['Каждый тип оружия имеет свой combo-паттерн'],addons:[]},
+    {name:'Spartan Weaponry',emoji:'🗡️',important:'recommended',desc:'30+ новых видов оружия: алебарды, рапиры, кинжалы, копья, катаны. Каждое со своей механикой.',addons:[]},
+    {name:'Curios API',emoji:'💍',important:'critical',desc:'Система слотов для аксессуаров: кольца, амулеты, пояса, шармы. Без него Artifacts не работает.',addons:[]},
+    {name:'Artifacts',emoji:'🏺',desc:'Уникальные артефакты в слотах Curio: Сапоги Гермеса, Зеркальный Щит, Кольцо Регенерации.',addons:['Curios API']},
+    {name:'Champions',emoji:'👑',important:'recommended',desc:'Элитные мобы с модификаторами: Огненный, Ядовитый, Отражающий, Невидимый. Дают улучшенный лут.',addons:[]},
+    {name:'Combat Roll',emoji:'🔄',desc:'Перекат клавишей Alt. Уклоняйся от атак.',addons:[]},
+    {name:'Shield Expansion',emoji:'🛡️',desc:'Щит получает новые механики: рикошет стрел, парирование, bash-атака.',addons:[]},
+    {name:'Dungeons and Taverns',emoji:'🏰',desc:'Новые структуры с врагами и лутом по всему миру.',addons:[]},
+  ],
+  explore:[
+    {name:'FTB Quests',emoji:'📋',important:'recommended',desc:'Система квестов и прогрессии сезона. Открой книгу квестов — там все цели и гайды.',tips:['Открой книгу квестов сразу после создания персонажа'],addons:['FTB Teams','FTB Library']},
+    {name:'Waystones',emoji:'🪨',important:'recommended',desc:'Камни телепортации. Активируй по всему миру и перемещайся между точками бесплатно.',addons:[]},
+    {name:"Alex's Caves",emoji:'🕳️',desc:'Подземные биомы: Кислотные пещеры, Магматические залы, Воздушные карманы — каждый с уникальной фауной.',addons:[]},
+    {name:'Dungeons Enhanced',emoji:'🗝️',desc:'Улучшенные данжи с новыми лут-таблицами и ловушками.',addons:[]},
+    {name:'Repurposed Structures',emoji:'🏗️',desc:'Вариации ванильных структур для каждого биома: деревни в джунглях, крепости в снегу.',addons:[]},
+    {name:"YUNG's Better Dungeons",emoji:'⛏️',desc:'Переработанные подземелья: много комнат, боссы, секретные ходы.',addons:[]},
+    {name:"YUNG's Better Mineshafts",emoji:'🚇',desc:'Разветвлённые шахты с рельсами, завалами и уникальным лутом.',addons:[]},
+  ],
+  biomes:[
+    {name:"Biomes O'Plenty",emoji:'🌲',important:'recommended',desc:'80+ новых биомов: Сакура, Мистический лес, Ядовитое болото.',addons:['TerraBlender']},
+    {name:"Oh The Biomes You'll Go",emoji:'🌏',desc:'Ещё 80 биомов с уникальной флорой и атмосферой.',addons:['TerraBlender']},
+    {name:'TerraBlender',emoji:'🗺️',important:'critical',desc:'Движок смешивания биомов. Без него конфликты генерации между BOP и OTBYG.',addons:[]},
+    {name:'Regions Unexplored',emoji:'🌄',desc:'Региональные биомы: Альпийские луга, Пепельные равнины, Мшистые скалы.',addons:['TerraBlender']},
+    {name:'Tectonic',emoji:'⛰️',desc:'Новый генератор рельефа: высокие горы, каньоны, острова.',addons:[]},
+  ],
+  decor:[
+    {name:'Supplementaries',emoji:'🪔',important:'recommended',desc:'Верёвки, фонари, флюгеры, знаки, рамки, напольные часы. 100+ предметов декора.',addons:['Supplementaries Squared']},
+    {name:"Macaw's Furniture",emoji:'🛋️',desc:'Диваны, столы, стулья, кровати — полноценная мебель.',addons:[]},
+    {name:'Decorative Blocks',emoji:'🧱',desc:'Столбы, балки, лестницы, решётки из любого материала.',addons:[]},
+    {name:'Chipped',emoji:'🪵',desc:'Сотни вариантов текстур для ванильных блоков.',addons:[]},
+    {name:"Macaw's Bridges",emoji:'🌉',desc:'Верёвочные и деревянные мосты через реки и пропасти.',addons:[]},
+  ],
+  qol:[
+    {name:'JEI',emoji:'📚',important:'critical',desc:'Just Enough Items — просмотр рецептов и использования предметов.',addons:['Just Enough Resources']},
+    {name:"Xaero's Minimap",emoji:'🗺️',important:'recommended',desc:'Миникарта с метками, мобами и путевыми точками.',addons:["Xaero's World Map"]},
+    {name:"Xaero's World Map",emoji:'🌍',desc:'Полная интерактивная карта мира. M — открыть.',addons:[]},
+    {name:'Jade',emoji:'🔍',important:'recommended',desc:'Информация о блоках и мобах при наведении: прочность, содержимое.',addons:[]},
+    {name:'AppleSkin',emoji:'🍎',desc:'Отображение сытости и насыщения на экране.',addons:[]},
+    {name:'Mouse Tweaks',emoji:'🖱️',desc:'Быстрое перетаскивание предметов: колесо мыши, drag-to-fill.',addons:[]},
+    {name:'Inventory HUD+',emoji:'🎒',desc:'Содержимое брони и быстрого доступа на экране.',addons:[]},
+    {name:'Just Enough Resources',emoji:'💰',desc:'Шансы дропа и таблицы лута в JEI.',addons:['JEI']},
+  ],
+  visual:[
+    {name:'Iris Shaders',emoji:'🌅',important:'recommended',desc:'Поддержка шейдеров без OptiFine. Работает вместе с Sodium.',addons:['Sodium']},
+    {name:'Entity Texture Features',emoji:'🐾',desc:'Случайные и эмиссивные текстуры мобов — разнообразие без текстурпаков.',addons:[]},
+    {name:'Entity Model Features',emoji:'🐉',desc:'Анимированные кастомные модели мобов (CEM-формат).',addons:[]},
+    {name:'Continuity',emoji:'🪟',desc:'Связанные текстуры стекла и блоков. Как OptiFine — только быстрее.',addons:['Sodium']},
+    {name:'Distant Horizons',emoji:'🏔️',desc:'LOD-рендеринг: чанки за горизонтом видны упрощённо. Дальность прорисовки ×4.',addons:[]},
+    {name:'Sodium Extra',emoji:'⚡',desc:'Дополнительные настройки Sodium: частицы, небо, анимации блоков.',addons:['Sodium']},
+  ],
+};
+const catColors_RASY={opt:'#22c55e',races:'#c026d3',magic:'#9d4edd',combat:'#ef4444',explore:'#2dd4bf',biomes:'#4ade80',decor:'#ec4899',qol:'#60a5fa',visual:'#fb7185'};
+const catNames_RASY={opt:'Оптимизация',races:'Расы',magic:'Магия',combat:'Боёвка',explore:'Исследование',biomes:'Биомы',decor:'Декор',qol:'QoL / UI',visual:'Визуал'};
+const catIcos_RASY={opt:'⚡',races:'👁️',magic:'🔮',combat:'⚔️',explore:'🌍',biomes:'🌲',decor:'🏠',qol:'🖥️',visual:'🎨'};
+const catDesc_RASY={opt:'Максимальный FPS и стабильность',races:'Система рас и происхождений',magic:'Заклинания и природная магия',combat:'Боёвка, оружие и аксессуары',explore:'Квесты, структуры и данжи',biomes:'Новые биомы и измерения',decor:'Мебель и декоративные блоки',qol:'Карты, рецепты, интерфейс',visual:'Шейдеры и визуальные улучшения'};
+const ADDONS_RASY={
+  'Indium':{emoji:'💎',desc:'Зависимость Sodium для совместимости с рендер-модами.'},
+  'Extra Origins':{emoji:'🌟',desc:'12 дополнительных рас для Origins.'},
+  'Origins: Classes':{emoji:'🎭',desc:'Система классов поверх рас Origins.'},
+  'Calio':{emoji:'✨',desc:'Дополнительные расы с нестандартными механиками.'},
+  'Apoli':{emoji:'⚙️',desc:'Движок способностей Origins. Обязательная зависимость.'},
+  'Ars Elemental':{emoji:'🌊',desc:'Стихийные источники для Ars Nouveau: молния, лёд, земля.'},
+  'Ars Creo':{emoji:'⚙️',desc:'Интеграция Ars Nouveau с Create.'},
+  'KubeJS Botania':{emoji:'🌸',desc:'Кастомные рецепты Botania через JavaScript.'},
+  'Hexal':{emoji:'🔮',desc:'Расширение Hexcasting: новые паттерны и способности.'},
+  'Hexgloop':{emoji:'🌀',desc:'Удобное колесо заклинаний для Hexcasting. Клавиша N.'},
+  'Curios API':{emoji:'💍',desc:'Слоты для аксессуаров: кольца, амулеты, пояса.'},
+  'FTB Teams':{emoji:'👥',desc:'Общий прогресс квестов для команды.'},
+  'FTB Library':{emoji:'📚',desc:'Техническая библиотека FTB.'},
+  'TerraBlender':{emoji:'🗺️',desc:'Движок смешивания биомов. Без него конфликты генерации.'},
+  'Supplementaries Squared':{emoji:'🏮',desc:'Расширение Supplementaries: ещё больше декора.'},
+  'Just Enough Resources':{emoji:'💰',desc:'Шансы дропа и таблицы лута в JEI.'},
+  "Xaero's World Map":{emoji:'🌍',desc:'Полная интерактивная карта мира.'},
+  'JEI':{emoji:'📚',desc:'Just Enough Items. Нужен для JER.'},
+  'Sodium':{emoji:'⚡',desc:'Главный рендерер. Нужен для Iris, Continuity, Sodium Extra.'},
+};
+const addonParents_RASY={};
+Object.entries(DATA_RASY).forEach(([cid,mods])=>{mods.forEach(m=>{(m.addons||[]).forEach(a=>{if(!addonParents_RASY[a])addonParents_RASY[a]=[];addonParents_RASY[a].push({mod:m,cid});});});});
+
+// ─── ДЖОДЖО DATA ─────────────────────────────────────────────────────────────
+const DATA_JOJO={
+  opt:[
+    {name:'Sodium',emoji:'⚡',important:'critical',desc:'Полная замена ванильного рендерера. Даёт 200–400% прироста FPS.',tips:['Без этого мода сборка теряет 40–60% FPS'],addons:['Indium']},
+    {name:'Lithium',emoji:'⚙️',important:'critical',desc:'Оптимизация логики: поиск пути, тики, физика блоков.',addons:[]},
+    {name:'Starlight',emoji:'✨',important:'critical',desc:'Переписанный движок освещения. Устраняет лаги при распространении света.',addons:[]},
+    {name:'C2ME',emoji:'🔀',important:'critical',desc:'Многопоточная генерация чанков — задействует все ядра CPU.',addons:[]},
+    {name:'FerriteCore',emoji:'💾',important:'critical',desc:'Снижает потребление RAM на 20–30%.',addons:[]},
+    {name:'ModernFix',emoji:'🔧',important:'recommended',desc:'30+ фиксов: ускорение запуска, уменьшение RAM.',addons:[]},
+    {name:'EntityCulling',emoji:'👁️',important:'recommended',desc:'Прекращает рендер сущностей вне поля зрения. +30–60% FPS.',addons:[]},
+    {name:'LazyDFU',emoji:'⏳',important:'recommended',desc:'Ускоряет запуск на 10–30 секунд.',addons:[]},
+    {name:'Dynamic FPS',emoji:'🔋',desc:'Снижает FPS до 1 когда окно не в фокусе.',addons:[]},
+    {name:'ImmediatelyFast',emoji:'🖥️',desc:'Оптимизация GUI, частиц, текста.',addons:[]},
+    {name:'Chunky',emoji:'🗺️',important:'recommended',desc:'Предгенерация чанков.',tips:['Запусти /chunky start перед первым заходом'],addons:[]},
+    {name:'Alternate Current',emoji:'🔴',desc:'Переписанная система редстоуна. В 10–50x быстрее.',addons:[]},
+    {name:'Spark',emoji:'📊',desc:'Профайлер. /spark profiler.',addons:[]},
+    {name:'BetterBiomeBlend',emoji:'🌈',desc:'Плавные переходы цветов биомов.',addons:[]},
+    {name:'CullLessLeaves',emoji:'🍃',desc:'Прореживание листьев вдали от игрока.',addons:[]},
+  ],
+  stands:[
+    {name:"JoJo's Bizarre Additions",emoji:'👊',important:'critical',desc:'Главный мод стэндов. 20+ стэндов из манги: Star Platinum, The World, Crazy Diamond и другие.',tips:['Стрела судьбы даёт случайный стэнд при применении','Сила стэнда зависит от духа владельца'],addons:['Ripple API','Arrow of Fate']},
+    {name:'Ripple API',emoji:'〰️',important:'critical',desc:'Движок волновой энергии Хамон. Основа для атак на основе жизненной энергии.',addons:[]},
+    {name:'Stand Craft',emoji:'⭐',important:'recommended',desc:'Крафт предметов для призыва и прокачки стэндов. Доска стэнда, Камень Души.',addons:['Ripple API']},
+    {name:'Arrow of Fate',emoji:'🏹',important:'recommended',desc:'Стрела судьбы — рандомный стэнд при попадании. Найти можно в сундуках данжей.',tips:['Стрела в сундуках руин и данжей'],addons:[]},
+    {name:'Stand Battle',emoji:'⚡',important:'recommended',desc:'PvP-механики для стэндов: парирование, Stand Rush, крики способностей.',addons:["JoJo's Bizarre Additions"]},
+    {name:'Hamon Arts',emoji:'☀️',desc:'Техники Хамон: Хамон-удар, волна жизни, усиление растений.',addons:['Ripple API']},
+    {name:'Stand Stats',emoji:'📊',desc:'Прокачка стэнда по параметрам: Сила, Скорость, Дальность, Точность.',addons:["JoJo's Bizarre Additions"]},
+    {name:'Requiem Ascension',emoji:'💀',desc:'Реквием-эволюция стэнда при особых условиях. Даёт уникальную способность.',addons:["JoJo's Bizarre Additions"]},
+  ],
+  combat:[
+    {name:'Epic Fight',emoji:'⚔️',important:'recommended',desc:'Полная боёвая система: combo-атаки с анимациями, уклонения, блоки, guard-break.',tips:['Shift во время атаки — уклонение','R — активация режима боя'],addons:[]},
+    {name:'Better Combat',emoji:'🗡️',important:'recommended',desc:'Уникальные паттерны ударов для каждого типа оружия.',addons:[]},
+    {name:'Combat Roll',emoji:'🔄',desc:'Перекат клавишей Alt. Незаменим в боях со стэндами.',addons:[]},
+    {name:'Spartan Weaponry',emoji:'🏹',important:'recommended',desc:'30+ видов оружия: алебарды, рапиры, кинжалы, копья.',addons:[]},
+    {name:'Curios API',emoji:'💍',important:'critical',desc:'Система слотов аксессуаров. Обязательная зависимость.',addons:[]},
+    {name:'Artifacts',emoji:'🏺',desc:'Артефакты в слотах Curio: Сапоги Гермеса, Кольцо Регенерации.',addons:['Curios API']},
+    {name:'Champions',emoji:'👑',important:'recommended',desc:'Элитные мобы с модификаторами и улучшенным лутом.',addons:[]},
+    {name:'Brutal Bosses',emoji:'🐲',desc:'Боссы с фазами, механиками и уникальной добычей.',addons:[]},
+    {name:'Dungeons and Taverns',emoji:'🏰',desc:'Новые структуры с врагами и лутом.',addons:[]},
+  ],
+  magic:[
+    {name:"Iron's Spells 'n Spellbooks",emoji:'📖',important:'recommended',desc:'Книга заклинаний: огонь, лёд, молния, некромантия. Уровни маны и прокачка.',tips:['Фокус заклинателя повышает урон заклинаний'],addons:['Spell Engine','Spell Power']},
+    {name:'Spell Engine',emoji:'🔮',important:'critical',desc:'Движок заклинаний. Без него Iron\'s Spells не работает.',addons:[]},
+    {name:'Ars Nouveau',emoji:'✨',desc:'Магия рисованием заклинаний. Создавай свои комбо-заклинания.',addons:['Ars Elemental']},
+    {name:'Hexcasting',emoji:'🌀',desc:'Паттерны заклинаний — тьюринг-полный магический язык.',addons:['Hexal','Hexgloop']},
+    {name:'Spell Power',emoji:'⚡',desc:'Прокачка силы заклинаний по школам.',addons:['Spell Engine']},
+    {name:'SpellBlade Next',emoji:'⚔️',desc:'Зачаровывай оружие заклинаниями: меч с молнией, кинжал с огнём.',addons:['Spell Engine']},
+  ],
+  explore:[
+    {name:'FTB Quests',emoji:'📋',important:'recommended',desc:'Квесты сезона Джоджо. Пройди путь от новичка до пользователя стэнда.',tips:['Выполняй квесты — они ведут по прогрессии стэндов'],addons:['FTB Teams','FTB Library']},
+    {name:'Waystones',emoji:'🪨',important:'recommended',desc:'Камни телепортации между точками мира.',addons:[]},
+    {name:"Alex's Caves",emoji:'🕳️',desc:'Подземные биомы с уникальной фауной и ресурсами.',addons:[]},
+    {name:"YUNG's Better Dungeons",emoji:'⛏️',desc:'Многоуровневые данжи с боссами — источник Стрел Судьбы.',addons:[]},
+    {name:'Repurposed Structures',emoji:'🏗️',desc:'Вариации структур для каждого биома.',addons:[]},
+    {name:'Dungeons Enhanced',emoji:'🗝️',desc:'Улучшенные данжи с новыми лут-таблицами.',addons:[]},
+  ],
+  biomes:[
+    {name:"Biomes O'Plenty",emoji:'🌲',important:'recommended',desc:'80+ новых биомов для исследования.',addons:['TerraBlender']},
+    {name:"Oh The Biomes You'll Go",emoji:'🌏',desc:'Ещё 80 биомов с уникальной флорой.',addons:['TerraBlender']},
+    {name:'TerraBlender',emoji:'🗺️',important:'critical',desc:'Движок смешивания биомов. Без него конфликты генерации.',addons:[]},
+    {name:'Terralith',emoji:'🏔️',desc:'Новый генератор рельефа с 85 биомами и уникальными структурами.',addons:[]},
+    {name:'Regions Unexplored',emoji:'🌄',desc:'Региональные биомы: Альпийские луга, Пепельные равнины.',addons:['TerraBlender']},
+  ],
+  decor:[
+    {name:'Supplementaries',emoji:'🪔',important:'recommended',desc:'100+ предметов декора: верёвки, фонари, знаки, флюгеры.',addons:['Supplementaries Squared']},
+    {name:"Macaw's Furniture",emoji:'🛋️',desc:'Диваны, столы, стулья, кровати.',addons:[]},
+    {name:'Decorative Blocks',emoji:'🧱',desc:'Столбы, балки, решётки из любого материала.',addons:[]},
+    {name:'Dark Paintings',emoji:'🖼️',desc:'Мрачные картины в стиле JoJo для декора.',addons:[]},
+    {name:'Chipped',emoji:'🪵',desc:'Сотни вариантов текстур для ванильных блоков.',addons:[]},
+  ],
+  qol:[
+    {name:'JEI',emoji:'📚',important:'critical',desc:'Just Enough Items — рецепты и использование предметов.',addons:['Just Enough Resources']},
+    {name:"Xaero's Minimap",emoji:'🗺️',important:'recommended',desc:'Миникарта с метками и путевыми точками.',addons:["Xaero's World Map"]},
+    {name:"Xaero's World Map",emoji:'🌍',desc:'Полная карта мира. M — открыть.',addons:[]},
+    {name:'Jade',emoji:'🔍',important:'recommended',desc:'Информация о блоках и мобах при наведении.',addons:[]},
+    {name:'AppleSkin',emoji:'🍎',desc:'Сытость и насыщение на экране.',addons:[]},
+    {name:'Mouse Tweaks',emoji:'🖱️',desc:'QoL для инвентаря: колесо мыши, drag-to-fill.',addons:[]},
+    {name:'Inventory HUD+',emoji:'🎒',desc:'Броня и быстрый доступ на экране.',addons:[]},
+    {name:'Just Enough Resources',emoji:'💰',desc:'Шансы дропа в JEI.',addons:['JEI']},
+  ],
+  visual:[
+    {name:'Iris Shaders',emoji:'🌅',important:'recommended',desc:'Поддержка шейдеров без OptiFine.',addons:['Sodium']},
+    {name:'Entity Texture Features',emoji:'🐾',desc:'Случайные и эмиссивные текстуры мобов.',addons:[]},
+    {name:'Entity Model Features',emoji:'🐉',desc:'Анимированные кастомные модели мобов.',addons:[]},
+    {name:'Continuity',emoji:'🪟',desc:'Связанные текстуры стекла и блоков.',addons:['Sodium']},
+    {name:'Distant Horizons',emoji:'🏔️',desc:'LOD-рендеринг: дальность прорисовки ×4.',addons:[]},
+    {name:'Sodium Extra',emoji:'⚡',desc:'Дополнительные настройки Sodium.',addons:['Sodium']},
+  ],
+};
+const catColors_JOJO={opt:'#22c55e',stands:'#f5b700',combat:'#ef4444',magic:'#9d4edd',explore:'#2dd4bf',biomes:'#4ade80',decor:'#ec4899',qol:'#60a5fa',visual:'#fb7185'};
+const catNames_JOJO={opt:'Оптимизация',stands:'Стэнды',combat:'Боёвка',magic:'Магия',explore:'Исследование',biomes:'Биомы',decor:'Декор',qol:'QoL / UI',visual:'Визуал'};
+const catIcos_JOJO={opt:'⚡',stands:'👊',combat:'⚔️',magic:'🔮',explore:'🌍',biomes:'🌲',decor:'🏠',qol:'🖥️',visual:'🎨'};
+const catDesc_JOJO={opt:'Максимальный FPS и стабильность',stands:'Стэнды, Хамон и сила духа',combat:'Боёвка, оружие и аксессуары',magic:'Заклинания и магические школы',explore:'Квесты, структуры и данжи',biomes:'Новые биомы и измерения',decor:'Мебель и декоративные блоки',qol:'Карты, рецепты, интерфейс',visual:'Шейдеры и визуальные улучшения'};
+const ADDONS_JOJO={
+  'Indium':{emoji:'💎',desc:'Зависимость Sodium для совместимости с рендер-модами.'},
+  'Ripple API':{emoji:'〰️',desc:'Движок волновой энергии Хамон.'},
+  'Arrow of Fate':{emoji:'🏹',desc:'Стрела судьбы для получения стэнда.'},
+  "JoJo's Bizarre Additions":{emoji:'👊',desc:'Главный мод стэндов.'},
+  'Spell Engine':{emoji:'🔮',desc:'Движок заклинаний. Нужен для Iron\'s Spells.'},
+  'Spell Power':{emoji:'⚡',desc:'Прокачка силы заклинаний по школам.'},
+  'Ars Elemental':{emoji:'🌊',desc:'Стихийные источники для Ars Nouveau.'},
+  'Hexal':{emoji:'🔮',desc:'Расширение Hexcasting.'},
+  'Hexgloop':{emoji:'🌀',desc:'Колесо заклинаний для Hexcasting. Клавиша N.'},
+  'Curios API':{emoji:'💍',desc:'Слоты аксессуаров.'},
+  'FTB Teams':{emoji:'👥',desc:'Общий прогресс квестов.'},
+  'FTB Library':{emoji:'📚',desc:'Техническая библиотека FTB.'},
+  'TerraBlender':{emoji:'🗺️',desc:'Движок смешивания биомов.'},
+  'Supplementaries Squared':{emoji:'🏮',desc:'Расширение Supplementaries.'},
+  'Just Enough Resources':{emoji:'💰',desc:'Шансы дропа в JEI.'},
+  "Xaero's World Map":{emoji:'🌍',desc:'Полная карта мира.'},
+  'JEI':{emoji:'📚',desc:'Just Enough Items.'},
+  'Sodium':{emoji:'⚡',desc:'Главный рендерер.'},
+  'SpellBlade Next':{emoji:'⚔️',desc:'Зачарование оружия заклинаниями.'},
+  'Stand Craft':{emoji:'⭐',desc:'Крафт предметов стэндов.'},
+  'Hamon Arts':{emoji:'☀️',desc:'Техники волновой энергии Хамон.'},
+};
+const addonParents_JOJO={};
+Object.entries(DATA_JOJO).forEach(([cid,mods])=>{mods.forEach(m=>{(m.addons||[]).forEach(a=>{if(!addonParents_JOJO[a])addonParents_JOJO[a]=[];addonParents_JOJO[a].push({mod:m,cid});});});});
+
 const catColors={opt:'#22c55e',tech:'#e8943a',magic:'#9d4edd',combat:'#ef4444',explore:'#2dd4bf',biomes:'#22c55e',mobs:'#eab308',decor:'#ec4899',food:'#eab308',storage:'#60a5fa',qol:'#2dd4bf',visual:'#fb7185'};
 const catNames={opt:'Оптимизация',tech:'Техника',magic:'Магия',combat:'Боёвка',explore:'Исследование',biomes:'Биомы',mobs:'Мобы',decor:'Декор',food:'Еда',storage:'Хранение',qol:'QoL / UI',visual:'Визуал'};
 const catIcos={opt:'⚡',tech:'⚙️',magic:'🔮',combat:'⚔️',explore:'🌍',biomes:'🌲',mobs:'🐉',decor:'🏠',food:'🍖',storage:'📦',qol:'🖥️',visual:'🎨'};
@@ -947,8 +1185,11 @@ function openSeason(s){
   document.getElementById('sv-dc').textContent=s.desc;
   const cnt=document.getElementById('sv-cnt');
   cnt.innerHTML='';
-  if(s.full)renderMvT(cnt);
-  else cnt.innerHTML=`<div class="cs"><span class="cs-ic">${s.emoji}</span><div class="cs-ttl">Архив сезона скоро</div><div class="cs-dc">Список модов и материалы сезона «${s.name}» появятся позже.</div></div>`;
+  if(s.full){
+    if(s.renderer==='rasy')renderRasy(cnt);
+    else if(s.renderer==='jojo')renderJojo(cnt);
+    else renderMvT(cnt);
+  }else cnt.innerHTML=`<div class="cs"><span class="cs-ic">${s.emoji}</span><div class="cs-ttl">Архив сезона скоро</div><div class="cs-dc">Список модов и материалы сезона «${s.name}» появятся позже.</div></div>`;
   vSeason.scrollTop=0;
   vSeason.classList.add('open');
   document.body.style.overflow='hidden';
@@ -963,29 +1204,29 @@ function closeSeason(){
 document.getElementById('sv-back').addEventListener('click',()=>{closeSeason();pSwp();});
 document.querySelectorAll('.lnk').forEach(a=>{a.addEventListener('click',()=>pLink());});
 
-// ─── MvT ENCYCLOPEDIA ─────────────────────────────────────────────────────────
-function renderMvT(cnt){
+// ─── ENCYCLOPEDIA RENDERER ────────────────────────────────────────────────────
+function renderEncyclopedia(cnt,data,cols,names,icos,descs,addonsDict,parentsDict){
+  activeCatNames=names;activeCatColors=cols;activeAddons=addonsDict;activeAddonParents=parentsDict;
   cnt.innerHTML=`
     <div class="sv-search-wrap"><div class="sv-search"><span class="sv-si">⌕</span><input id="sq" placeholder="Найти мод или аддон..." autocomplete="off"></div></div>
     <div class="sv-filters" id="sf-bar">
       <button class="sf on" data-f="all">Все</button>
       <button class="sf" data-f="critical">⚠ Критические</button>
-      ${Object.keys(DATA).map(k=>`<button class="sf" data-f="${k}">${catIcos[k]} ${catNames[k]}</button>`).join('')}
+      ${Object.keys(data).map(k=>`<button class="sf" data-f="${k}">${icos[k]} ${names[k]}</button>`).join('')}
     </div>
     <div class="sv-body" id="sv-body"></div>
   `;
   const body=cnt.querySelector('#sv-body');
-  // sections
-  Object.entries(DATA).forEach(([cid,mods])=>{
-    const col=catColors[cid]||'#f5b700';
+  Object.entries(data).forEach(([cid,mods])=>{
+    const col=cols[cid]||'#f5b700';
     const sec=document.createElement('div');
     sec.className='ms';sec.dataset.cat=cid;
     sec.innerHTML=`
       <div class="ms-hdr">
-        <div class="ms-ico">${catIcos[cid]}</div>
+        <div class="ms-ico">${icos[cid]}</div>
         <div class="ms-inf">
-          <div class="ms-ttl" style="color:${col}">${catNames[cid]}</div>
-          <div class="ms-dsc">${catDesc[cid]}</div>
+          <div class="ms-ttl" style="color:${col}">${names[cid]}</div>
+          <div class="ms-dsc">${descs[cid]}</div>
         </div>
         <div class="ms-cnt">${mods.length} модов</div>
       </div>
@@ -1060,6 +1301,10 @@ function renderMvT(cnt){
   });
 }
 
+function renderMvT(cnt){renderEncyclopedia(cnt,DATA,catColors,catNames,catIcos,catDesc,ADDONS,addonParents);}
+function renderRasy(cnt){renderEncyclopedia(cnt,DATA_RASY,catColors_RASY,catNames_RASY,catIcos_RASY,catDesc_RASY,ADDONS_RASY,addonParents_RASY);}
+function renderJojo(cnt){renderEncyclopedia(cnt,DATA_JOJO,catColors_JOJO,catNames_JOJO,catIcos_JOJO,catDesc_JOJO,ADDONS_JOJO,addonParents_JOJO);}
+
 // ─── WIKI PANEL ───────────────────────────────────────────────────────────────
 const wdim=document.getElementById('wdim'),wpanel=document.getElementById('wpanel');
 
@@ -1067,7 +1312,7 @@ function openWiki(m,cid,col){
   document.getElementById('wem').textContent=m.emoji;
   document.getElementById('wttl').textContent=m.name;
   const wcat=document.getElementById('wcat');
-  wcat.textContent=catNames[cid]||cid;wcat.style.color=col;wcat.style.borderColor=col;
+  wcat.textContent=activeCatNames[cid]||cid;wcat.style.color=col;wcat.style.borderColor=col;
   const wimp=document.getElementById('wimp');
   if(m.important){wimp.textContent=impLbls[m.important];wimp.className='wimp '+m.important;wimp.style.display='';}
   else wimp.style.display='none';
@@ -1093,19 +1338,21 @@ wdim.addEventListener('click',closeWiki);
 const adov=document.getElementById('adov');
 
 function openAddon(name){
-  const d=ADDONS[name];
+  const d=activeAddons[name];
   document.getElementById('adem').textContent=d?d.emoji:'➕';
   document.getElementById('adnm').textContent=name;
   document.getElementById('addc').textContent=d?d.desc:'Аддон / зависимость.';
   const pw=document.getElementById('adp-w'),ps=document.getElementById('adps');
-  const par=addonParents[name]||[];
+  const par=activeAddonParents[name]||[];
   if(par.length){
     ps.innerHTML=par.map(p=>`<span class="adpc" data-mod="${p.mod.name}" data-cid="${p.cid}">${p.mod.emoji} ${p.mod.name}</span>`).join('');
     ps.querySelectorAll('.adpc').forEach(chip=>{
       chip.addEventListener('click',()=>{
         closeAddon();
-        const mod=(DATA[chip.dataset.cid]||[]).find(m=>m.name===chip.dataset.mod);
-        if(mod)openWiki(mod,chip.dataset.cid,catColors[chip.dataset.cid]||'#f5b700');
+        const allData=Object.values({mvt:DATA,rasy:DATA_RASY,jojo:DATA_JOJO});
+        let mod,col='#f5b700';
+        for(const d of allData){const arr=d[chip.dataset.cid]||[];const m=arr.find(x=>x.name===chip.dataset.mod);if(m){mod=m;col=activeCatColors[chip.dataset.cid]||col;break;}}
+        if(mod)openWiki(mod,chip.dataset.cid,col);
       });
     });
     pw.style.display='';
