@@ -217,8 +217,7 @@ footer{position:relative;z-index:2;padding:16px 20px 24px;text-align:center;bord
 .sv-search input{background:none;border:none;outline:none;color:var(--text);font-family:'Nunito',sans-serif;font-size:.95rem;width:100%}
 .sv-search input::placeholder{color:var(--muted)}
 .sv-si{color:var(--dim);font-size:1rem;flex-shrink:0}
-.sv-filters{display:flex;gap:6px;padding:12px 32px;overflow-x:auto;scrollbar-width:none}
-.sv-filters::-webkit-scrollbar{display:none}
+.sv-filters{display:flex;flex-wrap:wrap;gap:6px;padding:12px 32px;justify-content:center}
 @media(max-width:768px){.sv-filters{padding:10px 12px}}
 .sf{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
 .sf:hover{color:var(--text)}
