@@ -235,8 +235,10 @@ footer{position:relative;z-index:2;padding:16px 20px 24px;text-align:center;bord
 .ms-dsc{font-size:.84rem;color:var(--dim);margin-top:3px}
 .ms-cnt{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:3px 10px;flex-shrink:0}
 .ms-line{height:1px;background:linear-gradient(90deg,var(--mc,var(--gold)),transparent);margin-bottom:18px;opacity:.4}
-.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:11px}
-@media(max-width:640px){.mg{grid-template-columns:1fr}}
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+@media(max-width:1100px){.mg{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.mg{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.mg{grid-template-columns:1fr}}
 
 /* MOD CARD */
 .mcard{background:var(--glass);border:1px solid var(--border);border-left:3px solid var(--mc,var(--gold));border-radius:10px;padding:16px;position:relative;overflow:hidden;cursor:pointer;transition:all .27s}
@@ -957,8 +959,6 @@ function renderMvT(cnt){
     <div class="sv-body" id="sv-body"></div>
   `;
   const body=cnt.querySelector('#sv-body');
-  // opt banner
-  body.insertAdjacentHTML('beforeend',`<div class="opt-bn"><div class="opt-bn-ic">🚀</div><div><h3>Стек оптимизации</h3><p>Sodium + Lithium + Starlight + C2ME + FerriteCore — без них сборка теряет 40–60% FPS.</p></div></div>`);
   // sections
   Object.entries(DATA).forEach(([cid,mods])=>{
     const col=catColors[cid]||'#f5b700';
