@@ -76,8 +76,8 @@ nav.sc{background:rgba(7,7,15,.93);backdrop-filter:blur(20px);border-color:var(-
 @media(max-width:600px){.nav-links{gap:4px}.nav-a:not(.nav-tg){display:none}}
 
 /* HERO */
-#hero{position:relative;min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;z-index:2;overflow:hidden}
-@media(max-width:768px){#hero{min-height:78vh;padding:70px 20px 50px}}
+#hero{position:relative;min-height:72vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 30px;z-index:2;overflow:hidden}
+@media(max-width:768px){#hero{min-height:62vh;padding:70px 20px 24px}}
 /* decorative orbs */
 .h-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(60px);opacity:.18;animation:orb-drift 8s ease-in-out infinite}
 .h-orb-a{width:300px;height:300px;background:var(--gold);top:-80px;left:-60px;animation-delay:0s}
@@ -114,7 +114,7 @@ nav.sc{background:rgba(7,7,15,.93);backdrop-filter:blur(20px);border-color:var(-
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
 
 /* SEASONS SECTION */
-#seasons{position:relative;z-index:2;padding:60px 0 80px}
+#seasons{position:relative;z-index:2;padding:20px 0 80px}
 .sec-label{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:40px;display:flex;align-items:center;justify-content:center;gap:14px}
 .sec-label::before,.sec-label::after{content:'';flex:1;max-width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--muted))}
 .sec-label::after{background:linear-gradient(90deg,var(--muted),transparent)}
@@ -399,7 +399,7 @@ mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
     <div class="h-stats">
       <div class="hst"><div class="hst-n">Десятки</div><div class="hst-l">Сезонов</div></div>
       <div class="hst"><div class="hst-n">Сотни</div><div class="hst-l">Модов</div></div>
-      <div class="hst"><div class="hst-n">∞</div><div class="hst-l">Приключений</div></div>
+      <div class="hst"><div class="hst-n" style="font-weight:900;font-size:clamp(2.4rem,7vw,3.2rem);line-height:1">∞</div><div class="hst-l">Приключений</div></div>
     </div>
   </section>
 
