@@ -416,11 +416,11 @@ mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
       <a class="lnk tg" href="https://t.me/YAICHKI_MK" target="_blank">
         <span class="lnk-ic">📢</span><div><div class="lnk-lbl">TG канал</div><div class="lnk-sub">@YAICHKI_MK</div></div>
       </a>
-      <a class="lnk dc" href="#" target="_blank">
-        <span class="lnk-ic">💬</span><div><div class="lnk-lbl">Discord</div><div class="lnk-sub">Скоро</div></div>
-      </a>
       <a class="lnk ow" href="https://t.me/Pico_Blammed" target="_blank">
         <span class="lnk-ic">🥚</span><div><div class="lnk-lbl">Главное Яйцо</div><div class="lnk-sub">@Pico_Blammed</div></div>
+      </a>
+      <a class="lnk dc" href="#" target="_blank">
+        <span class="lnk-ic">💬</span><div><div class="lnk-lbl">Discord</div><div class="lnk-sub">Скоро</div></div>
       </a>
       <a class="lnk" style="color:#a78bfa;border-color:rgba(167,139,250,.2)" href="https://t.me/sulaheh" target="_blank">
         <span class="lnk-ic">🐣</span><div><div class="lnk-lbl">Зам Яйцо</div><div class="lnk-sub">@sulaheh</div></div>
@@ -467,7 +467,7 @@ const SEASONS=[
    download:'https://drive.google.com/uc?export=download&id=1iyP6QH3UeK9iUtLUjBMlCCbV25yq1Z2J',full:false,dlLabel:'Скачать сборку'},
   {id:'mvt',num:'03',name:'Маги vs Техники',status:'next',badge:'⏭ Следующий сезон',color:'#7c3aed',emoji:'⚔️',
    desc:'425 модов. Две фракции — магическая и технологическая. Выбери сторону и построй лучший мир. Полная энциклопедия модов уже доступна.',
-   download:'https://boosty.to/denismasterherobrine',full:true,dlLabel:'ElerionBloodAndSteel-v0.9.5.1.746-beta.zip'}
+   download:'https://workupload.com/file/NtZwrRaQ7w3',full:true,dlLabel:'Скачать сборку'}
 ];
 
 // ─── MOD DATA (МвТ) ──────────────────────────────────────────────────────────
@@ -941,8 +941,8 @@ function openSeason(s){
   const badge=document.getElementById('sv-badge');
   badge.textContent=s.badge;badge.className=`sv-badge ${s.status}`;
   const dl=document.getElementById('sv-dl');
-  if(s.download){dl.href=s.download;dl.textContent='⬇ '+(s.dlLabel||'Скачать');dl.classList.remove('off');}
-  else{dl.href='#';dl.textContent='⬇ Скачать';dl.classList.add('off');}
+  if(s.download){dl.href=s.download;dl.textContent='⬇ Скачать сборку';dl.classList.remove('off');}
+  else{dl.href='#';dl.textContent='⬇ Скачать сборку';dl.classList.add('off');}
   document.getElementById('sv-hbg').style.cssText=`--sv-c:${s.color};position:absolute;inset:0;opacity:.07;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 0%,${s.color},transparent 70%)`;
   document.getElementById('sv-dc').textContent=s.desc;
   const cnt=document.getElementById('sv-cnt');
