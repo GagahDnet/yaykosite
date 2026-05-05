@@ -19,8 +19,11 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--gold) var(--bg2)}
+html.loading{overflow:hidden;scrollbar-width:none}
+html.loading::-webkit-scrollbar{display:none}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;min-height:100vh}
+body.loading{pointer-events:none;user-select:none}
 @media(hover:hover){body{cursor:none}}
 /* SCANLINES */
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.07) 3px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9990;animation:scan-move 8s linear infinite}
@@ -832,7 +835,15 @@ document.addEventListener('mousemove',e=>{pmx=e.clientX;pmy=e.clientY;},{passive
 
 // ─── LOADER ───────────────────────────────────────────────────────────────────
 setTimeout(()=>{pLoad();},2200);
-setTimeout(()=>{const l=document.getElementById('ldr');l.classList.add('gone');setTimeout(()=>l.remove(),1000);},2700);
+document.documentElement.classList.add('loading');
+document.body.classList.add('loading');
+setTimeout(()=>{
+  const l=document.getElementById('ldr');
+  l.classList.add('gone');
+  document.documentElement.classList.remove('loading');
+  document.body.classList.remove('loading');
+  setTimeout(()=>l.remove(),1000);
+},2700);
 
 // ─── NAV SCROLL ───────────────────────────────────────────────────────────────
 const nav=document.getElementById('nav');
