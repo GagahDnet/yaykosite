@@ -23,15 +23,16 @@ html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--gold) var
 body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;min-height:100vh}
 @media(hover:hover){body{cursor:none}}
 
-/* CURSOR */
-#cur,#cur-r{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
-#cur{width:12px;height:12px;border-radius:50%;background:var(--gold);mix-blend-mode:screen;box-shadow:0 0 16px var(--gold);transition:width .2s,height .2s,background .2s}
-#cur-r{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(245,183,0,.4);z-index:9998;transition:width .25s,height .25s}
-@media(hover:none){#cur,#cur-r{display:none}}
+/* CURSOR — only desktop with real mouse */
+#cur,#cur-r{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);display:none}
+@media(hover:hover) and (pointer:fine){
+  #cur{display:block;width:12px;height:12px;border-radius:50%;background:var(--gold);mix-blend-mode:screen;box-shadow:0 0 16px var(--gold);transition:width .2s,height .2s,background .2s}
+  #cur-r{display:block;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(245,183,0,.4);z-index:9998;transition:width .25s,height .25s}
+}
 
 /* LOADER */
-#ldr{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .7s,transform .7s}
-#ldr.gone{opacity:0;pointer-events:none;transform:scale(1.04)}
+#ldr{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease,transform 1s ease}
+#ldr.gone{opacity:0;pointer-events:none;transform:scale(1.02)}
 .ldr-logo{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(3rem,12vw,5rem);color:var(--gold);letter-spacing:.05em;animation:lp 1.8s ease infinite}
 .ldr-sub{font-size:.78rem;color:var(--dim);letter-spacing:.3em;text-transform:uppercase;margin-top:10px}
 .ldr-bar{width:180px;height:2px;background:var(--border2);border-radius:2px;margin-top:36px;overflow:hidden}
@@ -66,8 +67,23 @@ nav.sc{background:rgba(7,7,15,.93);backdrop-filter:blur(20px);border-color:var(-
 @media(max-width:600px){.nav-links{gap:4px}.nav-a:not(.nav-tg){display:none}}
 
 /* HERO */
-#hero{position:relative;min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;z-index:2}
-@media(max-width:768px){#hero{min-height:72vh;padding:70px 20px 50px}}
+#hero{position:relative;min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;z-index:2;overflow:hidden}
+@media(max-width:768px){#hero{min-height:78vh;padding:70px 20px 50px}}
+/* decorative orbs */
+.h-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(60px);opacity:.18;animation:orb-drift 8s ease-in-out infinite}
+.h-orb-a{width:300px;height:300px;background:var(--gold);top:-80px;left:-60px;animation-delay:0s}
+.h-orb-b{width:250px;height:250px;background:var(--violet);bottom:-40px;right:-50px;animation-delay:-3s}
+.h-orb-c{width:180px;height:180px;background:var(--cyan);top:50%;right:10%;animation-delay:-5s;opacity:.1}
+@keyframes orb-drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-15px) scale(1.08)}66%{transform:translate(-15px,10px) scale(.95)}}
+@media(max-width:768px){.h-orb{filter:blur(80px);opacity:.13}}
+/* accent line under name */
+.h-line{width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:14px auto 0;animation:fu .8s .65s both}
+/* hero badge row */
+.h-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;animation:fu .8s .28s both}
+.h-badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;padding:4px 14px;border-radius:20px;border:1px solid;white-space:nowrap}
+.h-badge.mc{color:var(--green);border-color:rgba(6,214,160,.25);background:rgba(6,214,160,.06)}
+.h-badge.srv{color:var(--violet);border-color:rgba(124,58,237,.25);background:rgba(124,58,237,.06)}
+.h-badge.fb{color:var(--cyan);border-color:rgba(0,212,255,.22);background:rgba(0,212,255,.05)}
 .h-eye{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(245,183,0,.25);background:rgba(245,183,0,.06);padding:5px 18px;border-radius:20px;margin-bottom:28px;display:inline-block;animation:fu .8s .3s both}
 .h-name{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(4.5rem,18vw,10rem);line-height:1;letter-spacing:-.01em;background:linear-gradient(135deg,#ffe566,#f5b700,#e07b00,#f5b700);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fu .9s .5s both,shimmer 4s 1.5s ease infinite;filter:drop-shadow(0 0 40px rgba(245,183,0,.3))}
 @keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
@@ -122,24 +138,27 @@ nav.sc{background:rgba(7,7,15,.93);backdrop-filter:blur(20px);border-color:var(-
 .sc-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;background:var(--c,var(--gold));color:var(--bg);border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;cursor:pointer;width:100%;transition:filter .2s,box-shadow .2s}
 .sc-btn:hover{filter:brightness(1.12);box-shadow:0 8px 24px rgba(0,0,0,.4)}
 
-/* TEAM */
-#team{position:relative;z-index:2;padding:40px 24px 80px;text-align:center}
-.team-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:32px}
-.tc{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:24px 32px;min-width:180px;transition:all .3s}
-.tc:hover{background:var(--glass2);border-color:var(--border2);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.3)}
-.tc-av{font-size:2.8rem;margin-bottom:10px}
-.tc-role{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
-.tc-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.95rem;color:var(--text)}
+/* LINKS SECTION */
+#links{position:relative;z-index:2;padding:32px 20px 64px}
+.lnk-ttl{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:24px}
+.lnk-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:520px;margin:0 auto}
+.lnk{display:flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid var(--border2);border-radius:24px;color:var(--dim);text-decoration:none;font-size:.85rem;font-family:'Nunito',sans-serif;transition:all .3s;background:var(--glass)}
+.lnk:hover,.lnk:active{background:var(--glass2);border-color:var(--border);color:var(--text);transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.lnk.tg{color:var(--cyan);border-color:rgba(0,212,255,.2)}
+.lnk.tg:hover{background:rgba(0,212,255,.07);border-color:var(--cyan)}
+.lnk.dc{color:#5865f2;border-color:rgba(88,101,242,.2)}
+.lnk.dc:hover{background:rgba(88,101,242,.07);border-color:#5865f2}
+.lnk.ow{color:var(--gold);border-color:rgba(245,183,0,.2)}
+.lnk.ow:hover{background:rgba(245,183,0,.07);border-color:var(--gold)}
+.lnk.ta{color:var(--green);border-color:rgba(6,214,160,.2)}
+.lnk.ta:hover{background:rgba(6,214,160,.07);border-color:var(--green)}
+.lnk-ic{font-size:1rem;flex-shrink:0}
+.lnk-lbl{font-size:.78rem}
+.lnk-sub{font-size:.65rem;color:var(--muted)}
 
 /* FOOTER */
-footer{position:relative;z-index:2;padding:48px 24px;text-align:center;border-top:1px solid var(--border)}
-.ft-logo{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.4rem;color:var(--gold);margin-bottom:14px;text-shadow:0 0 30px rgba(245,183,0,.25)}
-.ft-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
-.ft-a{display:flex;align-items:center;gap:6px;padding:8px 20px;border:1px solid var(--border2);border-radius:20px;color:var(--dim);text-decoration:none;font-size:.83rem;transition:all .25s}
-.ft-a:hover{color:var(--text);border-color:var(--border);background:var(--glass)}
-.ft-a.tg{color:var(--cyan);border-color:rgba(0,212,255,.2)}
-.ft-a.tg:hover{background:rgba(0,212,255,.08);border-color:var(--cyan)}
-.ft-copy{font-size:.7rem;color:var(--muted);letter-spacing:.1em}
+footer{position:relative;z-index:2;padding:16px 20px 24px;text-align:center;border-top:1px solid var(--border)}
+.ft-copy{font-size:.62rem;color:var(--muted);letter-spacing:.08em}
 
 /* ── SEASON DETAIL VIEW ─────────────────────────────── */
 #v-season{position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;transform:translateX(102%);transition:transform .45s cubic-bezier(.25,.46,.45,.94);scrollbar-width:thin;scrollbar-color:var(--gold) var(--bg2)}
@@ -286,8 +305,10 @@ footer{position:relative;z-index:2;padding:48px 24px;text-align:center;border-to
 @keyframes rgo{to{transform:scale(4);opacity:0}}
 
 /* REVEAL */
-.rev{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.rev{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
 .rev.vis{opacity:1;transform:none}
+/* smooth season view transition */
+#v-season{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
 </style>
 </head>
@@ -339,18 +360,26 @@ mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
     <div class="nav-links">
       <a class="nav-a nav-tg" href="https://t.me/YAICHKI_MK" target="_blank">📢 Telegram</a>
       <a class="nav-a" href="#seasons">Сезоны</a>
-      <a class="nav-a" href="#team">Команда</a>
+      <a class="nav-a" href="#links">Контакты</a>
     </div>
   </nav>
 
   <section id="hero">
-    <div class="h-eye">🥚 Minecraft · Сезонный сервер · Fabric</div>
+    <div class="h-orb h-orb-a"></div>
+    <div class="h-orb h-orb-b"></div>
+    <div class="h-orb h-orb-c"></div>
+    <div class="h-badges">
+      <span class="h-badge mc">Minecraft 1.19.2</span>
+      <span class="h-badge srv">Сезонный сервер</span>
+      <span class="h-badge fb">Fabric</span>
+    </div>
     <h1 class="h-name">ЯЙКО</h1>
+    <div class="h-line"></div>
     <p class="h-tag">Сезонные сборки · Разные миры · Один сервер</p>
     <div class="h-stats">
       <div class="hst"><div class="hst-n">3</div><div class="hst-l">Сезона</div></div>
       <div class="hst"><div class="hst-n">425</div><div class="hst-l">Модов</div></div>
-      <div class="hst"><div class="hst-n" id="hs-mods">∞</div><div class="hst-l">Приключений</div></div>
+      <div class="hst"><div class="hst-n">∞</div><div class="hst-l">Приключений</div></div>
     </div>
     <div class="h-scroll"><span>листай</span><div class="h-arr"></div></div>
   </section>
@@ -361,20 +390,26 @@ mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
     <div class="s-dots" id="s-dots"></div>
   </section>
 
-  <section id="team" class="rev">
-    <div class="sec-label">— Команда —</div>
-    <div class="team-row">
-      <div class="tc"><div class="tc-av">👑</div><div class="tc-role">Владелец</div><div class="tc-name">@sulaheh</div></div>
-      <div class="tc"><div class="tc-av">🔧</div><div class="tc-role">Техадмин</div><div class="tc-name">@KVAfusb</div></div>
+  <section id="links" class="rev">
+    <div class="lnk-ttl">— Контакты —</div>
+    <div class="lnk-grid">
+      <a class="lnk tg" href="https://t.me/YAICHKI_MK" target="_blank">
+        <span class="lnk-ic">📢</span><div><div class="lnk-lbl">TG канал</div><div class="lnk-sub">@YAICHKI_MK</div></div>
+      </a>
+      <a class="lnk dc" href="#" target="_blank">
+        <span class="lnk-ic">💬</span><div><div class="lnk-lbl">Discord</div><div class="lnk-sub">Скоро</div></div>
+      </a>
+      <a class="lnk ow" href="https://t.me/sulaheh" target="_blank">
+        <span class="lnk-ic">👑</span><div><div class="lnk-lbl">Создатель</div><div class="lnk-sub">@sulaheh</div></div>
+      </a>
+      <a class="lnk ta" href="https://t.me/KVAfusb" target="_blank">
+        <span class="lnk-ic">🔧</span><div><div class="lnk-lbl">Тех. Админ</div><div class="lnk-sub">@KVAfusb</div></div>
+      </a>
     </div>
   </section>
 
   <footer>
-    <div class="ft-logo">ЯЙКО</div>
-    <div class="ft-links">
-      <a class="ft-a tg" href="https://t.me/YAICHKI_MK" target="_blank">📢 Telegram канал</a>
-    </div>
-    <div class="ft-copy">Minecraft сезонный сервер · 2026</div>
+    <div class="ft-copy">ЯЙКО · Minecraft сезонный сервер · 2026</div>
   </footer>
 </div>
 
@@ -712,13 +747,17 @@ function tone(f,t,v,d,r2){
     o.start();o.stop(a.currentTime+d);
   }catch(e){}
 }
-const pHov=()=>{tone(1400,'sine',.018,.07,1900)};
+const pHov=()=>{tone(1400,'sine',.016,.07,1900)};
 const pClk=()=>{tone(280,'triangle',.06,.12,180);setTimeout(()=>tone(420,'sine',.03,.1,560),25)};
 const pOpn=()=>{tone(330,'sine',.055,.14,440);setTimeout(()=>tone(440,'sine',.04,.14,550),65);setTimeout(()=>tone(660,'sine',.035,.18,880),130)};
 const pCls=()=>{tone(550,'sine',.05,.12,330);setTimeout(()=>tone(330,'sine',.035,.14,200),75)};
 const pNav=()=>{tone(660,'triangle',.05,.09,880);setTimeout(()=>tone(880,'triangle',.035,.1,1100),55)};
 const pAd=()=>{tone(880,'sine',.045,.09,1200);setTimeout(()=>tone(1100,'sine',.035,.09,1400),55);setTimeout(()=>tone(1320,'sine',.025,.11,1760),110)};
 const pSwp=()=>{tone(200,'sine',.055,.18,550)};
+const pLoad=()=>{[330,440,550,660,880].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.04,.2,f*1.5),i*80))};
+const pDot=()=>{tone(900,'sine',.03,.07,1100)};
+const pLink=()=>{tone(500,'triangle',.04,.1,700);setTimeout(()=>tone(700,'sine',.03,.1,900),50)};
+const pTouch=()=>{tone(600,'sine',.025,.06,800)};
 
 // ─── RIPPLE ───────────────────────────────────────────────────────────────────
 function ripple(el,e){
@@ -732,8 +771,10 @@ function ripple(el,e){
 
 // ─── CURSOR ───────────────────────────────────────────────────────────────────
 const cur=document.getElementById('cur'),curR=document.getElementById('cur-r');
-let mx=0,my=0,rx=0,ry=0;
-if(cur&&window.matchMedia('(hover:hover)').matches){
+const hasRealMouse=window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+if(!hasRealMouse){cur&&cur.remove();curR&&curR.remove();}
+else if(cur){
+  let mx=0,my=0,rx=0,ry=0;
   document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
   (function anim(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(anim);})();
 }
@@ -773,7 +814,8 @@ document.addEventListener('mousemove',e=>{pmx=e.clientX;pmy=e.clientY;},{passive
 })();
 
 // ─── LOADER ───────────────────────────────────────────────────────────────────
-setTimeout(()=>{const l=document.getElementById('ldr');l.classList.add('gone');setTimeout(()=>l.remove(),800);},2600);
+setTimeout(()=>{pLoad();},2200);
+setTimeout(()=>{const l=document.getElementById('ldr');l.classList.add('gone');setTimeout(()=>l.remove(),1000);},2700);
 
 // ─── NAV SCROLL ───────────────────────────────────────────────────────────────
 const nav=document.getElementById('nav');
@@ -808,15 +850,25 @@ SEASONS.forEach((s,i)=>{
   `;
   card.addEventListener('click',e=>{ripple(card,e);pOpn();openSeason(s);});
   card.addEventListener('mouseenter',pHov);
+  card.addEventListener('touchstart',()=>pTouch(),{passive:true});
   sTrack.appendChild(card);
 
   const dot=document.createElement('button');
   dot.className='sdot'+(i===1?' active':'');
   dot.addEventListener('click',()=>{
-    card.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});pNav();
+    card.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});pDot();
   });
   sDots.appendChild(dot);
 });
+
+// Center on Джоджо (index 1 = current season) on load
+setTimeout(()=>{
+  const cards=[...sTrack.querySelectorAll('.sc')];
+  if(cards[1]){
+    const c=cards[1];
+    sTrack.scrollTo({left:c.offsetLeft-sTrack.clientWidth/2+c.offsetWidth/2,behavior:'instant'});
+  }
+},50);
 
 sTrack.addEventListener('scroll',()=>{
   const cards=[...sTrack.querySelectorAll('.sc')];
@@ -857,6 +909,7 @@ function closeSeason(){
 }
 
 document.getElementById('sv-back').addEventListener('click',()=>{closeSeason();pSwp();});
+document.querySelectorAll('.lnk').forEach(a=>{a.addEventListener('click',()=>pLink());});
 
 // ─── MvT ENCYCLOPEDIA ─────────────────────────────────────────────────────────
 function renderMvT(cnt){
