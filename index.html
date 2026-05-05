@@ -461,7 +461,7 @@ mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
 const SEASONS=[
   {id:'rasy',num:'01',name:'Расы',status:'past',badge:'⏮ Прошлый сезон',color:'#c026d3',emoji:'👁️',
    desc:'Промежуточный сезон. Мир рас и происхождений — каждый игрок выбирал расу со своими способностями, ограничениями и мировоззрением.',
-   download:'https://drive.google.com/uc?export=download&id=MODS_RAR_ID',full:false,dlLabel:'mods.rar'},
+   download:'https://workupload.com/file/4p4DDX7Xy83',full:false,dlLabel:'mods.rar'},
   {id:'jojo',num:'02',name:'Джоджо',status:'current',badge:'▶ Текущий сезон',color:'#f5b700',emoji:'✨',
    desc:'Стэнды, силы и яростные противостояния. Сезон вдохновлён вселенной JoJo\'s Bizarre Adventure — каждый игрок обладает уникальным стэндом.',
    download:'https://drive.google.com/uc?export=download&id=1iyP6QH3UeK9iUtLUjBMlCCbV25yq1Z2J',full:false,dlLabel:'Скачать сборку'},
@@ -941,7 +941,7 @@ function openSeason(s){
   const badge=document.getElementById('sv-badge');
   badge.textContent=s.badge;badge.className=`sv-badge ${s.status}`;
   const dl=document.getElementById('sv-dl');
-  if(s.download&&!s.download.includes('MODS_RAR_ID')){dl.href=s.download;dl.textContent='⬇ '+(s.dlLabel||'Скачать');dl.classList.remove('off');}
+  if(s.download){dl.href=s.download;dl.textContent='⬇ '+(s.dlLabel||'Скачать');dl.classList.remove('off');}
   else{dl.href='#';dl.textContent='⬇ Скачать';dl.classList.add('off');}
   document.getElementById('sv-hbg').style.cssText=`--sv-c:${s.color};position:absolute;inset:0;opacity:.07;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 0%,${s.color},transparent 70%)`;
   document.getElementById('sv-dc').textContent=s.desc;
