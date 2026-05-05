@@ -368,11 +368,6 @@ mark{background:rgba(245,183,0,.2);color:var(--gold);border-radius:2px}
     <div class="h-orb h-orb-a"></div>
     <div class="h-orb h-orb-b"></div>
     <div class="h-orb h-orb-c"></div>
-    <div class="h-badges">
-      <span class="h-badge mc">Minecraft 1.19.2</span>
-      <span class="h-badge srv">Сезонный сервер</span>
-      <span class="h-badge fb">Fabric</span>
-    </div>
     <h1 class="h-name">ЯЙКО</h1>
     <div class="h-line"></div>
     <p class="h-tag">Сезонные сборки · Разные миры · Один сервер</p>
@@ -874,8 +869,8 @@ sTrack.addEventListener('scroll',()=>{
   const cards=[...sTrack.querySelectorAll('.sc')];
   const dots=[...sDots.querySelectorAll('.sdot')];
   const cx=sTrack.scrollLeft+sTrack.clientWidth/2;
-  let ai=0;
-  cards.forEach((c,i)=>{if(c.offsetLeft+c.offsetWidth/2<=cx)ai=i;});
+  let ai=0,best=Infinity;
+  cards.forEach((c,i)=>{const d=Math.abs(c.offsetLeft+c.offsetWidth/2-cx);if(d<best){best=d;ai=i;}});
   dots.forEach((d,i)=>d.classList.toggle('active',i===ai));
 },{passive:true});
 
